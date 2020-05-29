@@ -68,15 +68,13 @@ if __name__=='__main__':
 	parser.add_argument('--nomicro', help='Test mode for only this number of micrograph',required=False)
 
 	args = parser.parse_args()
-	try: 
-		args.nomicro
-	except:
-		testmod = 0
-		print("Operating for the whole dataset")
-	else:
-		testmode = 1
+	if args.nomicro is not None:
+		testmod = 1
 		nomicro=args.nomicro
 		print("Operating in test mode for " + args.nomicro + " micrographs")
+	else:
+		testmode = 0
+		print("Operating for the whole dataset")		
 	
 	sys.exit(0)
 	# open input star, output star, output stack
@@ -92,9 +90,14 @@ if __name__=='__main__':
 	currimage=''
 	newmt=0
 	nparts=0 # for every line in starfile
+	count = 1
 	for line in instar:
+		# Control for test mode
+		if ( testmode == 1 and count == int(nomicro) ):
+			print("Finish test mode")
+			break		
 		record = line.split()
-		if len(record)==len(starlabels): # if line looks valid
+		if len(record)==len(starlabels): # if line looks valid			
 			partandstack=record[imagecol].split('@')
 			imagename=partandstack[1]
 			basename = os.path.basename(imagename)
@@ -117,6 +120,7 @@ if __name__=='__main__':
 					print('First file ever')
 				outstar=open(outdir + "/" + basename + "_MT" + helicaltubeid + ".star", 'w')
 				print(basename)
+				count += 1
 				writestarheader(outstar, starlabels)
 			writestarline(outstar, record)
 			newmt = 0
