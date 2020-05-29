@@ -65,7 +65,14 @@ if __name__=='__main__':
 	parser = argparse.ArgumentParser(description='Create multiple MT star files from a particle star file')
 	parser.add_argument('--istar', help='Input particle star file from Extraction',required=True)
 	parser.add_argument('--odir', help='Output dir for MT star files',required=True)
+	parser.add_argument('--nomicro', help='Test mode for only this number of micrograph',required=False)
+
 	args = parser.parse_args()
+	if exist(args.nomicro):
+		testmode = 1
+		nomicro=args.nomicro
+		print("Operating in test mode")
+	return	
 	# open input star, output star, output stack
 	#with open(args.istar,'r') as instar, open (args.ostar,'w') as avgstar, open(args.ostack,'wb') as outstack:
 	# prepare a temporary header for output stack
