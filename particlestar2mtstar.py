@@ -71,7 +71,7 @@ if __name__=='__main__':
 	try: 
 		args.nomicro
 	except:
-		testmod=0
+		testmod = 0
 		print("Operating for the whole dataset")
 	else:
 		testmode = 1
