@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Script to parse the particles from Extraction step into individual MT star file
 # Main code coming from John Rubinstein createstackfromstar.py
-# HB 2020/05/29
+# HB 2020/05/29 Tested & verified
 
 import os, sys, argparse, shutil, os.path, glob, string
 import numpy as n
@@ -44,12 +44,6 @@ def writestarline(outfile,records):
 	for item in records:
 		outfile.write(item+'  ')
 	outfile.write('\n')
-
-def starcol_containing_label(starlabels, substring):
-	for i, s in enumerate(starlabels):
-		if substring in s:
-			  return i
-	return -1
 
 def starcol_exact_label(starlabels, label):
 	"""New function to do exact match of relion label such as _rlnImageCol"""
@@ -117,7 +111,7 @@ if __name__=='__main__':
 				except:
 					print('First file ever')
 				outstar=open(outdir + "/" + basename + "_MT" + helicaltubeid + ".star", 'w')
-				print(basename + "MT" + helicaltubeid)
+				print(basename + "_MT" + helicaltubeid)
 				count += 1
 				writestarheader(outstar, starlabels)
 			writestarline(outstar, record)
