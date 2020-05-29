@@ -75,8 +75,6 @@ if __name__=='__main__':
 	else:
 		testmode = 0
 		print("Operating for the whole dataset")		
-	
-	sys.exit(0)
 	# open input star, output star, output stack
 	#with open(args.istar,'r') as instar, open (args.ostar,'w') as avgstar, open(args.ostack,'wb') as outstack:
 	# prepare a temporary header for output stack
@@ -111,9 +109,9 @@ if __name__=='__main__':
 					newmt = 1		
 			else: 		
 				newmt = 1
-			currid==helicaltubeid
-			currimage=imagename
-			if newmt==1:
+			currid = helicaltubeid
+			currimage = imagename
+			if newmt == 1:
 				try:
 					outstar.close()
 				except:
