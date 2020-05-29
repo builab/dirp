@@ -70,12 +70,14 @@ if __name__=='__main__':
 	args = parser.parse_args()
 	try: 
 		args.nomicro
-		testmode = 1
-		nomicro=args.nomicro
-		print("Operating in test mode")
 	except:
 		testmod=0
 		print("Operating for the whole dataset")
+	else:
+		testmode = 1
+		nomicro=args.nomicro
+		print("Operating in test mode")
+	
 	sys.exit(0)
 	# open input star, output star, output stack
 	#with open(args.istar,'r') as instar, open (args.ostar,'w') as avgstar, open(args.ostack,'wb') as outstack:
