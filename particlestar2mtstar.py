@@ -91,7 +91,7 @@ if __name__=='__main__':
 	count = 1
 	for line in instar:
 		# Control for test mode
-		if ( testmode == 1 and count == int(nomicro) ):
+		if ( testmode == 1 and count > int(nomicro) ):
 			print("Finish test mode")
 			break		
 		record = line.split()
@@ -100,7 +100,7 @@ if __name__=='__main__':
 			imagename=partandstack[1]
 			basename = os.path.basename(imagename)
 			basename = str.replace(basename, ".mrcs", "");	
-			print(basename)
+			#print(basename)
 			helicaltubeid = record[helicaltubeidcol]
 			if currimage == imagename:
 				if currid == helicaltubeid:
