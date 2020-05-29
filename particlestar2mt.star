@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+# Script to parse the particles from Extraction step into individual MT star file
+# Main code coming from John Rubinstein createstackfromstar.py
+# HB 2020/05/29
 
 import os, sys, argparse, shutil, os.path, glob, string
 import numpy as n
@@ -48,25 +51,31 @@ def starcol_containing_label(starlabels, substring):
               return i
     return -1
 
+# New function to do exact match of relion label such as _rlnImageCol
+def starcol_exact_label(starlabels, label):
+	for i, s enumerate(starlabels):
+        if label == s:
+            return i
+    return -1
+		
+
 if __name__=='__main__':
     # get name of input starfile, output starfile, output stack file
-    #parser = argparse.ArgumentParser(description='Create a single stack from particles specified in a starfile')
-    #parser.add_argument('--istar', help='Input starfile from which to get particle information',required=True)
-    #parser.add_argument('--ostar', help='Output starfile with corrected file name for particle stack',required=True)
-    #parser.add_argument('--ostack', help='Output particle stack containing only particles in starfile',required=True)
-    #args = parser.parse_args()
+    parser = argparse.ArgumentParser(description='Create multiple MT star files from a particle star file')
+    parser.add_argument('--istar', help='Input particle star file from Extraction',required=True)
+    parser.add_argument('--odir', help='Output dir for MT star files',required=True)
+    args = parser.parse_args()
     # open input star, output star, output stack
     #with open(args.istar,'r') as instar, open (args.ostar,'w') as avgstar, open(args.ostack,'wb') as outstack:
         # prepare a temporary header for output stack
-
-    avgstar = open ( 'Class3D/job270/run_it003_data.star', 'r')
-    indir = "wf2/Xform2/"
-    partstar = open("wf2/Xform2/particles.star", 'w')
-    starlabels = learnstarheader(avgstar)
-    writestarheader(partstar, starlabels)
+	instar = open(args.istar, 'r')
+    outdir = args.odir
+    starlabels = learnstarheader(instar)
     # Column definition
-    helicaltubeidcol=2
-    imagecol=7
+    helicaltubeidcol=starcol_exact_label(starlabels, '_rlnHelicalTubeID')
+	print(helicaltubeidcol)
+    imagecol=starcol_exact_label(starlabels, '_rlnImageName')
+	print(imagecol)
     anglerotcol=25
     angletiltcol=26
     anglepsicol=27
@@ -76,28 +85,27 @@ if __name__=='__main__':
     angletiltpriorcol=3
 
     nparts=0 # for every line in starfile
-    for line in avgstar:
-        record = line.split()
-        if len(record)==len(starlabels): # if line looks valid
-            partandstack=record[imagecol].split('@')
-            helicaltubeid = record[helicaltubeidcol]
-            basename = os.path.basename(partandstack[1])
-	    basename = str.replace(basename, "_avg.mrcs", "");
-	    print(basename)
+    #for line in avgstar:
+    #    record = line.split()
+    #    if len(record)==len(starlabels): # if line looks valid
+    #        partandstack=record[imagecol].split('@')
+    #        helicaltubeid = record[helicaltubeidcol]
+    #        basename = os.path.basename(partandstack[1])
+	#    basename = str.replace(basename, "_avg.mrcs", "");
+	#    print(basename)
             # write a record to the new starfile
-            instar=open(indir + basename +  ".star", 'r')
-            for item in instar:
-                partrecord = item.split()
-                if len(partrecord) == len(starlabels):
-                    partrecord[originxcol]=record[originxcol]
-                    partrecord[originycol]=record[originycol]
-                    partrecord[anglepsicol]=record[anglepsicol]
-                    partrecord[angletiltcol]=record[angletiltcol]
-                    partrecord[anglerotcol]=record[anglerotcol]
-                    partrecord[angletiltpriorcol]=record[angletiltpriorcol]
-                    partrecord[anglepsipriorcol]=record[anglepsipriorcol]
-                    writestarline(partstar,partrecord)
-            instar.close()
+    #        instar=open(indir + basename +  ".star", 'r')
+    #        for item in instar:
+    #            partrecord = item.split()
+     #           if len(partrecord) == len(starlabels):
+      #              partrecord[originxcol]=record[originxcol]
+      #              partrecord[originycol]=record[originycol]
+       #            partrecord[angletiltcol]=record[angletiltcol]
+        #            partrecord[anglerotcol]=record[anglerotcol]
+         #           partrecord[angletiltpriorcol]=record[angletiltpriorcol]
+          #          partrecord[anglepsipriorcol]=record[anglepsipriorcol]
+           #         writestarline(partstar,partrecord)
+           # instar.close()
             #record[imagecol] =str(1).zfill(6)+'@'+ str.replace(starfile, ".star", "_avg.mrcs")
             #print("{:.6f}".format(0))
             #record[psipriorcol] = "{:.6f}".format(0) 
@@ -106,5 +114,5 @@ if __name__=='__main__':
             #instar.close()
             #break
 
-    partstar.close()
-    avgstar.close()
+    #partstar.close()
+    #avgstar.close()
