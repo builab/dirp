@@ -53,7 +53,7 @@ def starcol_containing_label(starlabels, substring):
 
 # New function to do exact match of relion label such as _rlnImageCol
 def starcol_exact_label(starlabels, label):
-	for i, s enumerate(starlabels):
+    for i, s enumerate(starlabels):
         if label == s:
             return i
     return -1
@@ -68,14 +68,14 @@ if __name__=='__main__':
     # open input star, output star, output stack
     #with open(args.istar,'r') as instar, open (args.ostar,'w') as avgstar, open(args.ostack,'wb') as outstack:
         # prepare a temporary header for output stack
-	instar = open(args.istar, 'r')
+    instar = open(args.istar, 'r')
     outdir = args.odir
     starlabels = learnstarheader(instar)
     # Column definition
     helicaltubeidcol=starcol_exact_label(starlabels, '_rlnHelicalTubeID')
-	print(helicaltubeidcol)
+    print(helicaltubeidcol)
     imagecol=starcol_exact_label(starlabels, '_rlnImageName')
-	print(imagecol)
+    print(imagecol)
     anglerotcol=25
     angletiltcol=26
     anglepsicol=27
