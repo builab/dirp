@@ -76,6 +76,7 @@ if __name__=='__main__':
 	except:
 		testmod=0
 		print("Operating for the whole dataset")
+	sys.exit(0)
 	# open input star, output star, output stack
 	#with open(args.istar,'r') as instar, open (args.ostar,'w') as avgstar, open(args.ostack,'wb') as outstack:
 	# prepare a temporary header for output stack
