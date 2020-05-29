@@ -76,7 +76,7 @@ if __name__=='__main__':
 	else:
 		testmode = 1
 		nomicro=args.nomicro
-		print("Operating in test mode")
+		print("Operating in test mode for " + args.nomicro + " micrographs")
 	
 	sys.exit(0)
 	# open input star, output star, output stack
