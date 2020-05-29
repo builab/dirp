@@ -69,7 +69,7 @@ if __name__=='__main__':
 
 	args = parser.parse_args()
 	if args.nomicro is not None:
-		testmod = 1
+		testmode = 1
 		nomicro=args.nomicro
 		print("Operating in test mode for " + args.nomicro + " micrographs")
 	else:
