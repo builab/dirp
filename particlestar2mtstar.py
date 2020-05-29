@@ -75,8 +75,9 @@ if __name__=='__main__':
 	# Column definition
 	helicaltubeidcol=starcol_exact_label(starlabels, '_rlnHelicalTubeID')
 	imagecol=starcol_exact_label(starlabels, '_rlnImageName')
-	currid=-1
+	currid=''
 	currimage=''
+	newmt=0
 	nparts=0 # for every line in starfile
 	for line in instar:
 		record = line.split()
@@ -86,15 +87,24 @@ if __name__=='__main__':
 			basename = os.path.basename(imagename)
 			basename = str.replace(basename, ".mrcs", "");	
 			helicaltubeid = record[helicaltubeidcol]
-		if currid==-1:
-			currid=helicaltubeid
+			if currimage == imagename:
+				if currid == helicaltubeid:
+					newmt = 0
+				else:
+					newmt = 1		
+			else: 		
+				newmt = 1
+			currid==helicaltubeid
 			currimage=imagename
-			outstar=open(outdir + "/" + basename + "_MT" + helicaltubeid + ".star", 'w')
-			print(basename)
-			writestarheader(outstar, starlabels)
-			elif currid!=helicaltubeid		
-				currimage=imagename
-				writestarline(outstar,partrecord)
+			if newmt==1:
+				try:
+					outstar.close()
+				except:
+					print('First file ever')
+				outstar=open(outdir + "/" + basename + "_MT" + helicaltubeid + ".star", 'w')
+				print(basename)
+				writestarheader(outstar, starlabels)
+			writestarline(outstar, record)
 		    #instar.close()
 			#record[imagecol] =str(1).zfill(6)+'@'+ str.replace(starfile, ".star", "_avg.mrcs")
 			#print("{:.6f}".format(0))
@@ -103,6 +113,5 @@ if __name__=='__main__':
 			#writestarline(avgstar,record[:24])
 			#instar.close()
 			#break
-
-	#partstar.close()
+	instar.close()
 	#avgstar.close()
