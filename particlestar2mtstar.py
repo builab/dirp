@@ -68,11 +68,14 @@ if __name__=='__main__':
 	parser.add_argument('--nomicro', help='Test mode for only this number of micrograph',required=False)
 
 	args = parser.parse_args()
-	if exist(args.nomicro):
+	try: 
+		args.nomicro:
 		testmode = 1
 		nomicro=args.nomicro
 		print("Operating in test mode")
-	return	
+	except:
+		testmod=0
+		print("Operating for the whole dataset")
 	# open input star, output star, output stack
 	#with open(args.istar,'r') as instar, open (args.ostar,'w') as avgstar, open(args.ostack,'wb') as outstack:
 	# prepare a temporary header for output stack
