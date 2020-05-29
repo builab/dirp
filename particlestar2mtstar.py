@@ -86,6 +86,7 @@ if __name__=='__main__':
 			imagename=partandstack[1]
 			basename = os.path.basename(imagename)
 			basename = str.replace(basename, ".mrcs", "");	
+			print(basename)
 			helicaltubeid = record[helicaltubeidcol]
 			if currimage == imagename:
 				if currid == helicaltubeid:
@@ -105,6 +106,7 @@ if __name__=='__main__':
 				print(basename)
 				writestarheader(outstar, starlabels)
 			writestarline(outstar, record)
+			newmt = 0
 		    #instar.close()
 			#record[imagecol] =str(1).zfill(6)+'@'+ str.replace(starfile, ".star", "_avg.mrcs")
 			#print("{:.6f}".format(0))
