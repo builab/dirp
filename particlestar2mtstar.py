@@ -53,7 +53,7 @@ def starcol_containing_label(starlabels, substring):
 
 # New function to do exact match of relion label such as _rlnImageCol
 def starcol_exact_label(starlabels, label):
-    for i, s enumerate(starlabels):
+    for i, s in enumerate(starlabels):
         if label == s:
             return i
     return -1
