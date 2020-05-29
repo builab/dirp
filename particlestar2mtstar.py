@@ -117,7 +117,7 @@ if __name__=='__main__':
 				except:
 					print('First file ever')
 				outstar=open(outdir + "/" + basename + "_MT" + helicaltubeid + ".star", 'w')
-				print(basename)
+				print(basename + "MT" + helicaltubeid)
 				count += 1
 				writestarheader(outstar, starlabels)
 			writestarline(outstar, record)
