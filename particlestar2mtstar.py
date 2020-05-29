@@ -69,7 +69,7 @@ if __name__=='__main__':
 
 	args = parser.parse_args()
 	try: 
-		args.nomicro:
+		args.nomicro
 		testmode = 1
 		nomicro=args.nomicro
 		print("Operating in test mode")
