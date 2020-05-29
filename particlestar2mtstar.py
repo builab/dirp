@@ -54,7 +54,8 @@ def starcol_containing_label(starlabels, substring):
 # New function to do exact match of relion label such as _rlnImageCol
 def starcol_exact_label(starlabels, label):
     for i, s in enumerate(starlabels):
-        if label == s:
+        record=s.split()
+        if label == record[0]:
             return i
     return -1
 		
@@ -73,38 +74,28 @@ if __name__=='__main__':
     starlabels = learnstarheader(instar)
     # Column definition
     helicaltubeidcol=starcol_exact_label(starlabels, '_rlnHelicalTubeID')
-    print(helicaltubeidcol)
     imagecol=starcol_exact_label(starlabels, '_rlnImageName')
-    print(imagecol)
-    anglerotcol=25
-    angletiltcol=26
-    anglepsicol=27
-    originxcol=22
-    originycol=23
-    anglepsipriorcol=4
-    angletiltpriorcol=3
-
+    currid=-1
+    currimage=''
     nparts=0 # for every line in starfile
-    #for line in avgstar:
-    #    record = line.split()
-    #    if len(record)==len(starlabels): # if line looks valid
-    #        partandstack=record[imagecol].split('@')
-    #        helicaltubeid = record[helicaltubeidcol]
-    #        basename = os.path.basename(partandstack[1])
-	#    basename = str.replace(basename, "_avg.mrcs", "");
-	#    print(basename)
-            # write a record to the new starfile
-    #        instar=open(indir + basename +  ".star", 'r')
-    #        for item in instar:
-    #            partrecord = item.split()
-     #           if len(partrecord) == len(starlabels):
-      #              partrecord[originxcol]=record[originxcol]
-      #              partrecord[originycol]=record[originycol]
-       #            partrecord[angletiltcol]=record[angletiltcol]
-        #            partrecord[anglerotcol]=record[anglerotcol]
-         #           partrecord[angletiltpriorcol]=record[angletiltpriorcol]
-          #          partrecord[anglepsipriorcol]=record[anglepsipriorcol]
-           #         writestarline(partstar,partrecord)
+    for line in instar:
+        record = line.split()
+        if len(record)==len(starlabels): # if line looks valid
+            partandstack=record[imagecol].split('@')
+	    imagename=partandstack[1]
+            basename = os.path.basename(imagename)
+	    basename = str.replace(basename, ".mrcs", "");	
+            helicaltubeid = record[helicaltubeidcol]
+	    if currid==-1:
+                currid=helicaltubeid
+		currimage=imagename
+                outstar=open(outdir + "/" + basename + "_MT" + helicaltubeid + ".star", 'w')
+                print(basename)
+                writestarheader(outstar, starlabels)
+            elif currid!=helicaltubeid
+	    
+                currimage=imagename
+            writestarline(outstar,partrecord)
            # instar.close()
             #record[imagecol] =str(1).zfill(6)+'@'+ str.replace(starfile, ".star", "_avg.mrcs")
             #print("{:.6f}".format(0))
