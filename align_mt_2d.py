@@ -47,7 +47,7 @@ def readstarline(infile):
 	records = line.split()
 	return records
 	
-def starcountparticles(starfile)
+def starcountparticles(starfile):
 	"""Count how many particles inside the star file""""
 	nopart = 0
 	instar = open(starfile, 'r')
