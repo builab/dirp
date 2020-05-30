@@ -97,6 +97,10 @@ if __name__=='__main__':
 		count += 1
 		basename = os.path.basename(starfile)
         	basename = string.replace(basename, ".star", "")
+		# Check if output exists
+		if os.path.exists(outdir + "/" + basename + ".star"):
+			print("Skip " + starfile + " due to output exists")
+			continue
 		alndir = outdir + "/" + basename
 		try:
 			os.mkdir( alndir, 0755 );
@@ -105,9 +109,6 @@ if __name__=='__main__':
 		# Check if the min_particle statisfy, otherwise skip
 		if starcountparticles(starfile) < min_part:
 			print("Skip " + starfile + " due to minimum particles not pass" )
-			continue
-		if os.path.exists(outdir + "/" + basename + ".star"):
-			print("Skip " + starfile + " due to output exists")
 			continue
 		# Perform alignment
 		align2d(starfile, alndir + "/" + basename)
