@@ -107,7 +107,7 @@ if __name__=='__main__':
 			print("Skip " + starfile + " due to minimum particles not pass" )
 			continue
 		if os.path.exists(outdir + "/" + basename + ".star"):
-			print("Skip " + starfile " due to output exists")
+			print("Skip " + starfile + " due to output exists")
 			continue
 		# Perform alignment
 		align2d(starfile, alndir + "/" + basename)
