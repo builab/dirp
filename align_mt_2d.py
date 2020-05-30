@@ -22,6 +22,42 @@ def align2d(starfile, outprefix):
 	print(align2d)
 	os.system(align2d)
 	
+def learnstarheader(infile):
+	"""Learn which column contains which information from an already open starfile"""
+	infile.seek(0) # Go to the beginning of the starfile
+	doneheader = False
+	doneprelabels = False
+	headerlabels = []
+	while not doneprelabels:
+		line=infile.readline()
+		if line.startswith('loop_'):
+			doneprelabels = True # read until 'loop_'
+	while not doneheader:
+		line=infile.readline()
+		if not line.startswith('_'): # read all lines the start with '_'
+			doneheader = True
+		else:
+			headerlabels += [line] 
+	infile.seek(0) # return to beginning of starfile before return
+	return headerlabels
+
+def readstarline(infile):
+	"""Read a record (line) from an already open starfile and return XXX"""
+	line=infile.readline()
+	records = line.split()
+	return records
+	
+def starcountparticles(starfile)
+	"""Count how many particles inside the star file""""
+	nopart = 0
+	instar = open(starfile, 'r')
+	starlabels = learnstarheader(instar)
+	for line in instar:
+		record = line.split()
+		if len(record)==len(starlabels): # if line looks valid
+			nopart += 1			
+	return nopart
+	
 
 if __name__=='__main__':
 	# get name of input starfile, output starfile, output stack file
@@ -34,11 +70,7 @@ if __name__=='__main__':
 	args = parser.parse_args()
 	
 	min_part = int(args.min_particles)
-	
-	print(min_part)
-	
-	sys.exit()
-	
+
 	if args.nomicro is not None:
 		testmode = 1
 		nomicro=args.nomicro
@@ -68,6 +100,10 @@ if __name__=='__main__':
 			os.mkdir( alndir, 0755 );
 		except:
 			print( alndir + " exists")
+		# Check if the min_particle statisfy, otherwise skip
+		if starcountparticles(starfile) < min_part:
+			print("Skip " + starfile)
+			break
 		# Perform alignment
 		align2d(starfile, alndir + "/" + basename)
 		outstar =  alndir + "/" + basename + "_it006_data.star"
