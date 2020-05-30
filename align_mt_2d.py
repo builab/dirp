@@ -68,7 +68,7 @@ if __name__=='__main__':
 		try:
 			shutil.copyfile(outstar, outdir + "/" + basename + ".star")
 		except:	
-			print("Error copying file" + outstar)
+			print("Error copying file " + outstar)
 		try:
 			shutil.rmtree(alndir)
 		except:
