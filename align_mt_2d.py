@@ -2,6 +2,7 @@
 # Python script to run 2d alignment and create a combine star file
 # Realistically, only the combined star file is needed to keep
 # Right now, a lot of hard code but will be refined later
+# If output exist, skip alignment as well
 # HB 2020/05/30
 
 import os, sys, argparse, shutil, os.path, glob, string
@@ -103,7 +104,10 @@ if __name__=='__main__':
 			print( alndir + " exists")
 		# Check if the min_particle statisfy, otherwise skip
 		if starcountparticles(starfile) < min_part:
-			print("Skip " + starfile)
+			print("Skip " + starfile + " due to minimum particles not pass" )
+			continue
+		if os.path.exists(outdir + "/" + basename + ".star"):
+			print("Skip " + starfile " due to output exists")
 			continue
 		# Perform alignment
 		align2d(starfile, alndir + "/" + basename)
