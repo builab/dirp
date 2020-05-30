@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # Python script to run 2d alignment and create a combine star file
 # Realistically, only the combined star file is needed to keep
 # Right now, a lot of hard code but will be refined later
