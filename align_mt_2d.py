@@ -103,7 +103,7 @@ if __name__=='__main__':
 		# Check if the min_particle statisfy, otherwise skip
 		if starcountparticles(starfile) < min_part:
 			print("Skip " + starfile)
-			break
+			continue
 		# Perform alignment
 		align2d(starfile, alndir + "/" + basename)
 		outstar =  alndir + "/" + basename + "_it006_data.star"
