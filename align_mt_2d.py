@@ -48,7 +48,7 @@ def readstarline(infile):
 	return records
 	
 def starcountparticles(starfile):
-	"""Count how many particles inside the star file""""
+	"""Count how many particles inside the star file"""
 	nopart = 0
 	instar = open(starfile, 'r')
 	starlabels = learnstarheader(instar)
