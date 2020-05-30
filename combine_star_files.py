@@ -47,7 +47,7 @@ if __name__=='__main__':
 	# get name of input starfile, output starfile, output stack file
 	parser = argparse.ArgumentParser(description='Combine star files into one from a regular expression pattern')
 	parser.add_argument('--istar', help='Input particle star file pattern (Extract/MT*.star)',required=True)
-	parser.add_argument('--ostar', help='Output combine star file',required=True)
+	parser.add_argument('--ostar', help='Output combine star file (particles_cbn.star)',required=True)
 	parser.add_argument('--nomicro', help='Test mode for only this number of micrograph',required=False)
 
 	args = parser.parse_args()
