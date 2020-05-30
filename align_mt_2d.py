@@ -65,8 +65,14 @@ if __name__=='__main__':
 		align2d(starfile, alndir + "/" + basename)
 		outstar =  alndir + "/" + basename + "_it006_data.star"
 		outmrc = alndir + "/" + basename + "_it006_classes.mrcs"
-		shutil.copyfile(outstar, outdir + "/" + basename + ".star")
-		shutil.rmtree(alndir)
+		try:
+			shutil.copyfile(outstar, outdir + "/" + basename + ".star")
+		except:	
+			print("Error copying file" + outstar)
+		try:
+			shutil.rmtree(alndir)
+		except:
+			print("Cannot remove " + alndir)
 		count += 1
 
 
