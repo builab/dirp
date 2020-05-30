@@ -4,8 +4,6 @@
 # HB 2020/05/30 Tested & verified
 
 import os, sys, argparse, shutil, os.path, glob, string
-import numpy as n
-
 
 def learnstarheader(infile):
 	"""Learn which column contains which information from an already open starfile"""
