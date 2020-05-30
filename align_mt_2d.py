@@ -28,10 +28,17 @@ if __name__=='__main__':
 	parser = argparse.ArgumentParser(description='Perform 2D alignment of microtubule segment')
 	parser.add_argument('--idir', help='Input dir for microtubule star file',required=True)
 	parser.add_argument('--odir', help='Output dir for MT star files',required=True)
+	parser.add_argument('--min_particles', help='Minium number of particles',required=False,default=10)
 	parser.add_argument('--nomicro', help='Test mode for only this number of micrographs',required=False)
 
 	args = parser.parse_args()
-
+	
+	min_part = int(args.min_particles)
+	
+	print(min_part)
+	
+	sys.exit()
+	
 	if args.nomicro is not None:
 		testmode = 1
 		nomicro=args.nomicro
