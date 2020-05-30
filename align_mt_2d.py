@@ -93,6 +93,7 @@ if __name__=='__main__':
 		if ( testmode == 1 and count > int(nomicro) ):
 			print("Finish test mode")
 			break	
+		count += 1
 		basename = os.path.basename(starfile)
         	basename = string.replace(basename, ".star", "")
 		alndir = outdir + "/" + basename
@@ -116,7 +117,7 @@ if __name__=='__main__':
 			shutil.rmtree(alndir)
 		except:
 			print("Cannot remove " + alndir)
-		count += 1
+
 
 
 
