@@ -56,7 +56,7 @@ if __name__=='__main__':
 			break	
 		basename = os.path.basename(starfile)
         	basename = string.replace(basename, ".star", "")
-		alndir = outdir + basename
+		alndir = outdir + "/" + basename
 		try:
 			os.mkdir( alndir, 0755 );
 		except:
