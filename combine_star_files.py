@@ -43,24 +43,17 @@ def writestarline(outfile,records):
 	for item in records:
 		outfile.write(item+'  ')
 	outfile.write('\n')
-
-def starcol_exact_label(starlabels, label):
-	"""New function to do exact match of relion label such as _rlnImageCol"""
-	for i, s in enumerate(starlabels):
-		record=s.split()
-		if label == record[0]:
-			return i
-	return -1
 		
 
 if __name__=='__main__':
 	# get name of input starfile, output starfile, output stack file
-	parser = argparse.ArgumentParser(description='Create multiple MT star files from a particle star file')
-	parser.add_argument('--istar', help='Input particle star file from Extraction',required=True)
-	parser.add_argument('--odir', help='Output dir for MT star files',required=True)
+	parser = argparse.ArgumentParser(description='Combine star files into one from a regular expression pattern')
+	parser.add_argument('--istar', help='Input particle star file pattern (Extract/MT*.star)',required=True)
+	parser.add_argument('--ostar', help='Output combine star file',required=True)
 	parser.add_argument('--nomicro', help='Test mode for only this number of micrograph',required=False)
 
 	args = parser.parse_args()
+	print(args.istar)
 	if args.nomicro is not None:
 		testmode = 1
 		nomicro=args.nomicro
@@ -68,60 +61,24 @@ if __name__=='__main__':
 	else:
 		testmode = 0
 		print("Operating for the whole dataset")		
-	# open input star, output star, output stack
-	#with open(args.istar,'r') as instar, open (args.ostar,'w') as avgstar, open(args.ostack,'wb') as outstack:
-	# prepare a temporary header for output stack
-	instar = open(args.istar, 'r')
-	outdir = args.odir
-	starlabels = learnstarheader(instar)
-	# Column definition
-	helicaltubeidcol=starcol_exact_label(starlabels, '_rlnHelicalTubeID')
-	imagecol=starcol_exact_label(starlabels, '_rlnImageName')
-	currid=''
-	currimage=''
-	newmt=0
-	nparts=0 # for every line in starfile
+	liststar=glob.glob(args.istar)
+	outstar = open(args.ostar, 'w')
+	
 	count = 1
-	for line in instar:
+	for starfile in liststar:
 		# Control for test mode
 		if ( testmode == 1 and count > int(nomicro) ):
 			print("Finish test mode")
-			break		
-		record = line.split()
-		if len(record)==len(starlabels): # if line looks valid			
-			partandstack=record[imagecol].split('@')
-			imagename=partandstack[1]
-			basename = os.path.basename(imagename)
-			basename = str.replace(basename, ".mrcs", "");	
-			#print(basename)
-			helicaltubeid = record[helicaltubeidcol]
-			if currimage == imagename:
-				if currid == helicaltubeid:
-					newmt = 0
-				else:
-					newmt = 1		
-			else: 		
-				newmt = 1
-			currid = helicaltubeid
-			currimage = imagename
-			if newmt == 1:
-				try:
-					outstar.close()
-				except:
-					print('First file ever')
-				outstar=open(outdir + "/" + basename + "_MT" + helicaltubeid + ".star", 'w')
-				print(basename + "_MT" + helicaltubeid)
-				count += 1
-				writestarheader(outstar, starlabels)
-			writestarline(outstar, record)
-			newmt = 0
-		    #instar.close()
-			#record[imagecol] =str(1).zfill(6)+'@'+ str.replace(starfile, ".star", "_avg.mrcs")
-			#print("{:.6f}".format(0))
-			#record[psipriorcol] = "{:.6f}".format(0) 
-			# Write a trim record to 24 column only
-			#writestarline(avgstar,record[:24])
-			#instar.close()
-			#break
-	instar.close()
-	#avgstar.close()
+			break	
+		instar = open(starfile, 'r')
+		starlabels = learnstarheader(instar)
+		if count == 1: # First star file
+			writestarheader(outstar, starlabels)	
+		count += 1
+		for line in instar:
+			record = line.split()
+			if len(record)==len(starlabels): # if line looks valid			
+				writestarline(outstar, record)
+		instar.close()
+
+	outstar.close()
