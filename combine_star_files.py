@@ -68,6 +68,7 @@ if __name__=='__main__':
 		if ( testmode == 1 and count > int(nomicro) ):
 			print("Finish test mode")
 			break	
+		print("Combining " + starfile)
 		instar = open(starfile, 'r')
 		starlabels = learnstarheader(instar)
 		if count == 1: # First star file
