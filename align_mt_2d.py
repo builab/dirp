@@ -47,7 +47,8 @@ if __name__=='__main__':
 		os.mkdir( outdir, 0755 );
 	except:
 		print("Output directory exist")
-
+	
+	count = 1
 	for starfile in liststar:
 		# Control for test mode
 		if ( testmode == 1 and count > int(nomicro) ):
