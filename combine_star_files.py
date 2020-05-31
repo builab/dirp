@@ -46,12 +46,12 @@ def writestarline(outfile,records):
 if __name__=='__main__':
 	# get name of input starfile, output starfile, output stack file
 	parser = argparse.ArgumentParser(description='Combine star files into one from a regular expression pattern')
-	parser.add_argument('--istar', help='Input particle star file pattern (Extract/MT*.star)',required=True)
+	parser.add_argument('--istarpattern', help='Input particle star file pattern (Extract/MT*.star)',required=True)
 	parser.add_argument('--ostar', help='Output combine star file (particles_cbn.star)',required=True)
 	parser.add_argument('--nomicro', help='Test mode for only this number of micrograph',required=False)
 
 	args = parser.parse_args()
-	print(args.istar)
+	#print(args.istar)
 	if args.nomicro is not None:
 		testmode = 1
 		nomicro=args.nomicro
@@ -59,7 +59,7 @@ if __name__=='__main__':
 	else:
 		testmode = 0
 		print("Operating for the whole dataset")		
-	liststar=glob.glob(args.istar)
+	liststar=glob.glob(args.istarpattern)
 	outstar = open(args.ostar, 'w')
 	
 	count = 1
