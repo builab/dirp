@@ -7,14 +7,20 @@ import os, sys, argparse, shutil, os.path, glob, string
 import multiprocessing as mp
 from shutil import copyfile
 
-def applytransformation(instar, outputrootname):		  
+def applytransformation(starfile, outdir):		  
 	"""Apply transformation to a stack"""
-	transform2d = "relion_stack_create --i " + instar + " --o " + outputrootname + " --apply_transformation"
+	basename = os.path.basename(starfile)
+        basename = string.replace(basename, ".star", "")
+	transform2d = "relion_stack_create --i " + starfile + " --o " + outputdir + "/" + basename + " --apply_transformation"
 	print(transform2d)
 	os.system(transform2d)
 	
-def averagestack(instack, outstack):
+def averagestack(starfile, outdir):
 	"""Average stack"""
+	basename = os.path.basename(starfile)
+        basename = string.replace(basename, ".star", "")
+	instack = outdir + "/" + basename + ".mrcs"
+	outstack = outdir + "/" + basename + "_avg.mrcs"
 	average2d = "relion_image_handler --i " + instack + " --o " + outstack + " --average"
 	print(average2d)
 	os.system(average2d)
@@ -116,6 +122,7 @@ if __name__=='__main__':
 		
 	pool.close()
 		   
+	sys.exit()
 	# Create average star file
 	print ("Create output " + args.ostar + " from " + outdir + "/*.star")
 	listxformstar=glob.glob(outdir + "/*.star")
