@@ -2,6 +2,7 @@
 # Python script to transform and average particles after reextraction
 # Create also star file of the average microtubule
 # Parallelize the xform & average using pool.apply()
+# HB 2020/06/01 Seems to work but need to test on cluster
 
 import os, sys, argparse, shutil, os.path, glob, string
 import multiprocessing as mp
