@@ -80,7 +80,8 @@ if __name__=='__main__':
 	for starfile in liststar:
 		if ( testmode == 1 and count > int(nomicro) ):
 			print("Finish test mode")
-			break	
+			break
+		count += 1
 		basename = os.path.basename(starfile)
         	basename = string.replace(basename, ".star", "")
 		applytransformation(starfile, outdir + "/" + basename)
@@ -100,6 +101,7 @@ if __name__=='__main__':
 		if ( testmode == 1 and count > int(nomicro) ):
 			print("Finish test mode")
 			break	
+		count += 1
 		instar = open ( starfile, 'r' )
 		# learn the starfile header and column for image names
 		starlabels=learnstarheader(instar)
