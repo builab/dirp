@@ -77,7 +77,7 @@ if __name__=='__main__':
 
 	liststar=glob.glob(args.istarpattern)
 	outdir = args.odir
-	outstar = args.ostar
+	outstar = open(args.ostar, 'w')
 	
 	count = 1
 	# Create average microtubule
@@ -89,4 +89,29 @@ if __name__=='__main__':
         	basename = string.replace(basename, ".star", "")
 		applytransformation(starfile, outdir + "/" + basename)
 		averagestack(outdir + "/" + basename + ".mrcs", outdir + "/" + basename + "_avg.mrcs")
+		
+	# Create average star file
+	listxformstar=glob.glob(outdir + "/*.star")
+   	starfile = listxformstar[0]
+    	instar = open ( starfile, 'r')
+    	starlabels = learnstarheader(instar)
+   	instar.close()
+   	# write new trimmed (24 col) output starfile header
+    	writestarheader(outstar, starlabels[:24])   
 	
+	for starfile in listxformstar:
+		instar = open ( starfile, 'r' )
+		# learn the starfile header and column for image names
+		starlabels=learnstarheader(instar)
+		imagecol = starcol_exact_label(starlabels, '_rlnImageName')
+		for line in instar:
+			record = line.split()
+			if len(record)==len(starlabels): # if line looks valid
+				partandstack=record[imagecol].split('@')
+				# write a record to the new starfile
+				record[imagecol] =str(1).zfill(6)+'@'+ str.replace(starfile, ".star", "_avg.mrcs")
+				# Write a trim record to 24 column only
+				writestarline(outstar,record[:24])
+				instar.close()
+				break
+	outstar.close()
