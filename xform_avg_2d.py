@@ -89,15 +89,17 @@ if __name__=='__main__':
 		
 	
 	# Create average star file
-	print ("Create output " + args.ostar + "from " + outdir + "/*.star")
-	listxformstar=glob.glob(outdir + "/*.star")
-	sys.exit(0)
+	print ("Create output " + args.ostar + " from " + outdir + "/*.star")
+	listxformstar=glob.glob(outdir + "/*.star"
    	starfile = listxformstar[0]
+	print(starfile)
     	instar = open ( starfile, 'r')
     	starlabels = learnstarheader(instar)
    	instar.close()
    	# write new trimmed (24 col) output starfile header
     	writestarheader(outstar, starlabels[:24])   
+	sys.exit(0)
+
 	
 	count = 1
 	for starfile in listxformstar:
