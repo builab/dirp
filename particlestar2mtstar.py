@@ -59,7 +59,7 @@ if __name__=='__main__':
 	parser = argparse.ArgumentParser(description='Create multiple MT star files from a particle star file')
 	parser.add_argument('--istar', help='Input particle star file from Extraction',required=True)
 	parser.add_argument('--odir', help='Output dir for MT star files',required=True)
-	parser.add_argument('--adjustpsi', help='Adjust psi based on the psi prior',required=False,default=0)
+	parser.add_argument('--adjustpsi', help='Adjust psi based on the psi prior (0 or 1, default 0)',required=False,default=0)
 	parser.add_argument('--nomicro', help='Test mode for only this number of micrograph',required=False)
 
 	args = parser.parse_args()
