@@ -10,15 +10,11 @@ def applytransformation(instar, outputrootname):
 	print(transform2d)
 	os.system(transform2d)
 	
-def averagestack(instack, outstack)
+def averagestack(instack, outstack):
 	"""Average stack"""
 	average2d = "relion_image_handler --i " + instack + " --o " + outstack + " --average"
 	print(transform2d)
 	os.system(transform2d)
-	
-def createavgstar(instar, avgstar)
-	"""Generate the average star file"""
-	
 	
 def learnstarheader(infile):
 	"""Learn which column contains which information from an already open starfile"""
