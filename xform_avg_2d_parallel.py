@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # Python script to transform and average particles after reextraction
 # Create also star file of the average microtubule
-# Parallelize the xform & average
+# Parallelize the xform & average using pool.apply()
 
 import os, sys, argparse, shutil, os.path, glob, string
+import multiprocessing as mp
 from shutil import copyfile
 
 def applytransformation(instar, outputrootname):		  
@@ -81,9 +82,12 @@ if __name__=='__main__':
 	parser.add_argument('--istarpattern', help='Input particle star file pattern (Extract/MT*.star)',required=True)
 	parser.add_argument('--odir', help='Output dir for transformed and average files',required=True)
 	parser.add_argument('--ostar', help='Output star file for the average segments',required=True)
+	parser.add_argument('--j', help='Number of threads',required=False,default=4)
 	parser.add_argument('--nomicro', help='Test mode for only this number of micrographs',required=False)
 
 	args = parser.parse_args()
+	
+	nocpu = int(args.j)
 	
 	if args.nomicro is not None:
 		testmode = 1
@@ -100,19 +104,18 @@ if __name__=='__main__':
 	if os.path.exists(args.ostar):
 		os.remove(args.ostar)
 	
-	count = 1
 	# Create average microtubule
-	for starfile in liststar:
-		if ( testmode == 1 and count > int(nomicro) ):
-			print("Finish test mode")
-			break
-		count += 1
-		basename = os.path.basename(starfile)
-        	basename = string.replace(basename, ".star", "")
-		applytransformation(starfile, outdir + "/" + basename)
-		averagestack(outdir + "/" + basename + ".mrcs", outdir + "/" + basename + "_avg.mrcs")
-		
+	# Init multiprocessing.Pool()
+	pool = mp.Pool(nocpu)
 	
+	if ( testmode == 1 ):
+		liststar = liststar[:nomicro]
+
+	pool.apply(applytransformation, args(starfile, outdir)) for starfile in liststar
+	pool.apply(averagestack, args(starfile, outdir) for starfile in liststar
+		
+	pool.close()
+		   
 	# Create average star file
 	print ("Create output " + args.ostar + " from " + outdir + "/*.star")
 	listxformstar=glob.glob(outdir + "/*.star")
