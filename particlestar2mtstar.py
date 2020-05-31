@@ -60,9 +60,14 @@ if __name__=='__main__':
 	parser = argparse.ArgumentParser(description='Create multiple MT star files from a particle star file')
 	parser.add_argument('--istar', help='Input particle star file from Extraction',required=True)
 	parser.add_argument('--odir', help='Output dir for MT star files',required=True)
+	parser.add_argument('--adjustpsi', help='Adjust psi based on the psi prior',required=False,default=0)
 	parser.add_argument('--nomicro', help='Test mode for only this number of micrograph',required=False)
 
 	args = parser.parse_args()
+	
+	# Adjust psi is true or not
+	adjustpsi = int(args.adjustpsi)
+	
 	if args.nomicro is not None:
 		testmode = 1
 		nomicro=args.nomicro
@@ -77,8 +82,10 @@ if __name__=='__main__':
 	outdir = args.odir
 	starlabels = learnstarheader(instar)
 	# Column definition
-	helicaltubeidcol=starcol_exact_label(starlabels, '_rlnHelicalTubeID')
-	imagecol=starcol_exact_label(starlabels, '_rlnImageName')
+	helicaltubeidcol = starcol_exact_label(starlabels, '_rlnHelicalTubeID')
+	imagecol = starcol_exact_label(starlabels, '_rlnImageName')
+	psicol = starcol_exact_label(starlabels, '_rlnAnglePsi')
+	psipriorcol = starcol_exact_label(starlabels, '_rlnAnglePsiPrior')
 	currid=''
 	currimage=''
 	newmt=0
@@ -115,15 +122,12 @@ if __name__=='__main__':
 				print(basename + "_MT" + helicaltubeid)
 				count += 1
 				writestarheader(outstar, starlabels)
-			writestarline(outstar, record)
+			if adjustpsi == 1:
+				newpsi = float(record[psicol]) - float(record[psipriorcol])
+				record[psicol] = "{:.6f}".format(newpsi) 
+				writestarline(outstar, record)
+			else:
+				writestarline(outstar, record)
 			newmt = 0
-		    #instar.close()
-			#record[imagecol] =str(1).zfill(6)+'@'+ str.replace(starfile, ".star", "_avg.mrcs")
-			#print("{:.6f}".format(0))
-			#record[psipriorcol] = "{:.6f}".format(0) 
-			# Write a trim record to 24 column only
-			#writestarline(avgstar,record[:24])
-			#instar.close()
-			#break
+
 	instar.close()
-	#avgstar.close()
