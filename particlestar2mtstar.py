@@ -85,8 +85,6 @@ if __name__=='__main__':
 	imagecol = starcol_exact_label(starlabels, '_rlnImageName')
 	psicol = starcol_exact_label(starlabels, '_rlnAnglePsi')
 	psipriorcol = starcol_exact_label(starlabels, '_rlnAnglePsiPrior')
-	print(psicol)
-	print(psipriorcol)
 	currid=''
 	currimage=''
 	newmt=0
