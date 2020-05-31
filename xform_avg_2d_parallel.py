@@ -124,6 +124,7 @@ if __name__=='__main__':
 	
 	# Done parallel processing
 	pool.close()
+	pool.join()
 		   
 	# Create average star file
 	print ("Create output " + args.ostar + " from " + outdir + "/*.star")
