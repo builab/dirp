@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # Python script to transform and average particles after reextraction
 # Create also star file of the average microtubule
+# Parallelize the xform & average
+
 import os, sys, argparse, shutil, os.path, glob, string
 from shutil import copyfile
 
