@@ -87,8 +87,11 @@ if __name__=='__main__':
 		applytransformation(starfile, outdir + "/" + basename)
 		averagestack(outdir + "/" + basename + ".mrcs", outdir + "/" + basename + "_avg.mrcs")
 		
+	
 	# Create average star file
+	print ("Create output " + args.ostar + "from " + outdir + "/*.star")
 	listxformstar=glob.glob(outdir + "/*.star")
+	sys.exit(0)
    	starfile = listxformstar[0]
     	instar = open ( starfile, 'r')
     	starlabels = learnstarheader(instar)
