@@ -73,7 +73,6 @@ if __name__=='__main__':
 
 	liststar=glob.glob(args.istarpattern)
 	outdir = args.odir
-	outstar = open(args.ostar, 'w')
 	
 	count = 1
 	# Create average microtubule
@@ -93,6 +92,7 @@ if __name__=='__main__':
 	listxformstar=glob.glob(outdir + "/*.star")
 	starfile = listxformstar[0]
 	print(starfile)
+	outstar = open(args.ostar, 'w')
 	instar = open ( starfile, 'r')
 	starlabels = learnstarheader(instar)
 	instar.close()
