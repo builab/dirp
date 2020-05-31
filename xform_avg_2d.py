@@ -35,6 +35,12 @@ def learnstarheader(infile):
 	infile.seek(0) # return to beginning of starfile before return
 	return headerlabels
 
+def writestarheader(outfile,headerlabels):		  
+	"""With an already opened starfile write a header"""
+	outfile.write('\ndata_\n\nloop_\n')
+	for label in headerlabels:
+		outfile.write(label)
+
 def readstarline(infile):
 	"""Read a record (line) from an already open starfile and return XXX"""
 	line=infile.readline()
