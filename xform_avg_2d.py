@@ -13,8 +13,8 @@ def applytransformation(instar, outputrootname):
 def averagestack(instack, outstack):
 	"""Average stack"""
 	average2d = "relion_image_handler --i " + instack + " --o " + outstack + " --average"
-	print(transform2d)
-	os.system(transform2d)
+	print(average2d)
+	os.system(average2d)
 	
 def learnstarheader(infile):
 	"""Learn which column contains which information from an already open starfile"""
@@ -95,7 +95,11 @@ if __name__=='__main__':
    	# write new trimmed (24 col) output starfile header
     	writestarheader(outstar, starlabels[:24])   
 	
+	count = 1
 	for starfile in listxformstar:
+		if ( testmode == 1 and count > int(nomicro) ):
+			print("Finish test mode")
+			break	
 		instar = open ( starfile, 'r' )
 		# learn the starfile header and column for image names
 		starlabels=learnstarheader(instar)
