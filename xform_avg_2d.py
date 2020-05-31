@@ -115,7 +115,6 @@ if __name__=='__main__':
 	print ("Create output " + args.ostar + " from " + outdir + "/*.star")
 	listxformstar=glob.glob(outdir + "/*.star")
 	starfile = listxformstar[0]
-	print(starfile)
 	outstar = open(args.ostar, 'w')
 	instar = open ( starfile, 'r')
 	starlabels = learnstarheader(instar)
@@ -129,6 +128,7 @@ if __name__=='__main__':
 			print("Finish test mode")
 			break	
 		count += 1
+		print("Reading " + starfile)
 		instar = open ( starfile, 'r' )
 		# learn the starfile header and column for image names
 		starlabels=learnstarheader(instar)
