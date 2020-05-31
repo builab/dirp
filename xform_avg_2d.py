@@ -47,6 +47,12 @@ def readstarline(infile):
 	records = line.split()
 	return records
 
+def writestarline(outfile,records):
+	"""Write a record (line) to an already open starfile"""
+	for item in records:
+		outfile.write(item+'  ')
+	outfile.write('\n')
+
 def starcol_exact_label(starlabels, label):
 	"""New function to do exact match of relion label such as _rlnImageCol"""
 	for i, s in enumerate(starlabels):
