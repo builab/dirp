@@ -46,6 +46,14 @@ def readstarline(infile):
 	line=infile.readline()
 	records = line.split()
 	return records
+
+def starcol_exact_label(starlabels, label):
+	"""New function to do exact match of relion label such as _rlnImageCol"""
+	for i, s in enumerate(starlabels):
+		record=s.split()
+		if label == record[0]:
+			return i
+	return -1
 	
 def starcountparticles(starfile):
 	"""Count how many particles inside the star file"""
