@@ -74,6 +74,10 @@ if __name__=='__main__':
 	liststar=glob.glob(args.istarpattern)
 	outdir = args.odir
 	
+	# Check if the outstar file exists
+	if os.path.exists(args.ostar):
+		os.remove(args.ostar
+	
 	count = 1
 	# Create average microtubule
 	for starfile in liststar:
