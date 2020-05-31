@@ -122,12 +122,15 @@ if __name__=='__main__':
 	pool.map(applytransformation, liststar, 1) 
 	pool.map(averagestack, liststar, 1)	
 	
+	# Done parallel processing
 	pool.close()
 		   
-	sys.exit()
 	# Create average star file
 	print ("Create output " + args.ostar + " from " + outdir + "/*.star")
 	listxformstar=glob.glob(outdir + "/*.star")
+	if ( testmode == 1 ):
+		listxformstar = listxformstar[:nomicro]
+
 	starfile = listxformstar[0]
 	outstar = open(args.ostar, 'w')
 	instar = open ( starfile, 'r')
