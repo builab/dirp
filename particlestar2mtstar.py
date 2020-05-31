@@ -5,7 +5,6 @@
 # 2020/05/31 Add option to adjust psi based on psi prior before split
 
 import os, sys, argparse, shutil, os.path, glob, string
-import numpy as n
 
 
 
