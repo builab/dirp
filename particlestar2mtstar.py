@@ -2,7 +2,7 @@
 # Script to parse the particles from Extraction step into individual MT star file
 # Main code coming from John Rubinstein createstackfromstar.py
 # HB 2020/05/29 Tested & verified
-# 2020/05/31 Add option to adjust transform before split
+# 2020/05/31 Add option to adjust psi based on psi prior before split
 
 import os, sys, argparse, shutil, os.path, glob, string
 import numpy as n
@@ -86,6 +86,8 @@ if __name__=='__main__':
 	imagecol = starcol_exact_label(starlabels, '_rlnImageName')
 	psicol = starcol_exact_label(starlabels, '_rlnAnglePsi')
 	psipriorcol = starcol_exact_label(starlabels, '_rlnAnglePsiPrior')
+	print(psicol)
+	print(psipriorcol)
 	currid=''
 	currimage=''
 	newmt=0
