@@ -90,7 +90,7 @@ if __name__=='__main__':
 	
 	# Create average star file
 	print ("Create output " + args.ostar + " from " + outdir + "/*.star")
-	listxformstar=glob.glob(outdir + "/*.star"
+	listxformstar=glob.glob(outdir + "/*.star")
 	starfile = listxformstar[0]
 	print(starfile)
 	instar = open ( starfile, 'r')
