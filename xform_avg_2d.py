@@ -82,7 +82,7 @@ if __name__=='__main__':
 	
 	# Check if the outstar file exists
 	if os.path.exists(args.ostar):
-		os.remove(args.ostar
+		os.remove(args.ostar)
 	
 	count = 1
 	# Create average microtubule
