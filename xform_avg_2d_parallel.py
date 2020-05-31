@@ -8,20 +8,14 @@ import os, sys, argparse, shutil, os.path, glob, string
 import multiprocessing as mp
 from shutil import copyfile
 
-def applytransformation(starfile):		  
-	"""Apply transformation to a stack"""
+def xform_avg(starfile):		  
+	"""Apply transformation to a stack and then average"""
 	# Using global outdir variable. Bad but might work
 	basename = os.path.basename(starfile)
         basename = string.replace(basename, ".star", "")
 	transform2d = "relion_stack_create --i " + starfile + " --o " + outdir + "/" + basename + " --apply_transformation"
 	print(transform2d)
 	os.system(transform2d)
-	
-def averagestack(starfile):
-	"""Average stack"""
-	# Using global outdir variable. Bad but might work
-	basename = os.path.basename(starfile)
-        basename = string.replace(basename, ".star", "")
 	instack = outdir + "/" + basename + ".mrcs"
 	outstack = outdir + "/" + basename + "_avg.mrcs"
 	average2d = "relion_image_handler --i " + instack + " --o " + outstack + " --average"
@@ -120,8 +114,7 @@ if __name__=='__main__':
 	if ( testmode == 1 ):
 		liststar = liststar[:nomicro]
 
-	pool.map(applytransformation, liststar, 1) 
-	pool.map(averagestack, liststar, 1)	
+	pool.map(xform_avg, liststar, 1) 
 	
 	# Done parallel processing
 	pool.close()
