@@ -127,7 +127,7 @@ if __name__=='__main__':
 				count += 1
 				writestarheader(outstar, starlabels)
 			if noclass > 1:
-				record[classnumbercol] = partclass % noclass + 1
+				record[classnumbercol] = "{}".format(partclass % noclass + 1)
 				partclass += 1
 			if adjustpsi == 1:
 				newpsi = float(record[psicol]) - float(record[psipriorcol])
