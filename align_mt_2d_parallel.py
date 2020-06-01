@@ -3,7 +3,7 @@
 # Realistically, only the combined star file is needed to keep
 # Right now, a lot of hard code but will be refined later
 # If output exist, skip alignment as well
-# HB 2020/05/30 NOT TESTED
+# HB 2020/05/30 Tested & Verified
 
 import os, sys, argparse, shutil, os.path, glob, string
 import multiprocessing as mp
