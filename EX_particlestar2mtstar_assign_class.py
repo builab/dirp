@@ -61,16 +61,18 @@ if __name__=='__main__':
 	parser.add_argument('--istar', help='Input particle star file from Extraction',required=True)
 	parser.add_argument('--odir', help='Output dir for MT star files',required=True)
 	parser.add_argument('--adjustpsi', help='Adjust psi based on the psi prior (0 or 1, default 0)',required=False,default=0)
+	parser.add_argument('--noclass', help='Adding class number for averaging',required=False,default=1)
 	parser.add_argument('--nomicro', help='Test mode for only this number of micrograph',required=False)
 
 	args = parser.parse_args()
 	
 	# Adjust psi is true or not
 	adjustpsi = int(args.adjustpsi)
+	noclass = int(args.noclass)
 	
 	if args.nomicro is not None:
 		testmode = 1
-		nomicro=args.nomicro
+		nomicro=int(args.nomicro)
 		print("Operating in test mode for " + args.nomicro + " micrographs")
 	else:
 		testmode = 0
@@ -86,11 +88,13 @@ if __name__=='__main__':
 	imagecol = starcol_exact_label(starlabels, '_rlnImageName')
 	psicol = starcol_exact_label(starlabels, '_rlnAnglePsi')
 	psipriorcol = starcol_exact_label(starlabels, '_rlnAnglePsiPrior')
+	classnumbercol = starcol_exact_label(starlabels, '_rlnClassNumber')
 	currid=''
 	currimage=''
 	newmt=0
 	nparts=0 # for every line in starfile
 	count = 1
+	partclass = 1
 	for line in instar:
 		# Control for test mode
 		if ( testmode == 1 and count > int(nomicro) ):
@@ -122,12 +126,13 @@ if __name__=='__main__':
 				print(basename + "_MT" + helicaltubeid)
 				count += 1
 				writestarheader(outstar, starlabels)
+			if noclass > 1:
+				record[classnumbercol] = partclass % noclass + 1
+				partclass += 1
 			if adjustpsi == 1:
 				newpsi = float(record[psicol]) - float(record[psipriorcol])
 				record[psicol] = "{:.6f}".format(newpsi) 
-				writestarline(outstar, record)
-			else:
-				writestarline(outstar, record)
+			writestarline(outstar, record)
 			newmt = 0
 
 	instar.close()
