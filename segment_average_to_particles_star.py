@@ -100,7 +100,7 @@ if __name__=='__main__':
 			basename = str.replace(basename, "_avg.mrcs", "");
 			print(basename)
 			# write a record to the new starfile
-			instar=open(indir + basename +  ".star", 'r')
+			instar=open(indir + "/" + basename +  ".star", 'r')
 			for item in instar:
 				partrecord = item.split()
 				if len(partrecord) == len(starlabels):
