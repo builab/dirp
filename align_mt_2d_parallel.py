@@ -104,7 +104,7 @@ if __name__=='__main__':
 
 	if args.nomicro is not None:
 		testmode = 1
-		nomicro=args.nomicro
+		nomicro=int(args.nomicro)
 		print("Operating in test mode for " + args.nomicro + " micrographs")
 	else:
 		testmode = 0
