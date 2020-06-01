@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --ntasks=4                   # Number of processes
+#SBATCH --ntasks=10                   # Number of processes
 #SBATCH --partition=cpu
 #SBATCH --job-name=xform_avg # Job name
 #SBATCH --error=xform_avg.err
@@ -10,5 +10,5 @@
 module load python-2.7.14-gcc-4.9.4-tzsdd67
 module load relion/3.0b-jan19
 
-python  dirp/xform_avg_2d_parallel.py --istarpattern "Xform/*.star" --odir AvgTest --ostar AvgTest/segment_average.star --j 4
+python  dirp/align_mt_2d_parallel.py --idir mtstar --odir align2d --min_particles 10 --j 10
 
