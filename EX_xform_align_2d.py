@@ -86,9 +86,11 @@ if __name__=='__main__':
 
 	args = parser.parse_args()
 	
+	avgclass = init(args.avgclass)
+	
 	if args.nomicro is not None:
 		testmode = 1
-		nomicro=args.nomicro
+		nomicro=int(args.nomicro)
 		print("Operating in test mode for " + args.nomicro + " micrographs")
 	else:
 		testmode = 0
@@ -110,10 +112,10 @@ if __name__=='__main__':
 		count += 1
 		basename = os.path.basename(starfile)
         	basename = string.replace(basename, ".star", "")
-		applytransformation(starfile, outdir + "/" + basename)
+		applytransformation(starfile, outdir + "/" + basename)		
 		averagestack(outdir + "/" + basename + ".mrcs", outdir + "/" + basename + "_avg.mrcs")
 		
-	
+	sys.exit(0)
 	# Create average star file
 	print ("Create output " + args.ostar + " from " + outdir + "/*.star")
 	listxformstar=glob.glob(outdir + "/*.star")
