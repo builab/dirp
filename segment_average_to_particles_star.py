@@ -58,6 +58,8 @@ if __name__=='__main__':
 	parser.add_argument('--ostar', help='Output particle star file',required=True)
 	parser.add_argument('--nomicro', help='Test mode for only this number of micrograph',required=False)
 	
+	args = parser.parse_args()
+	
 	if args.nomicro is not None:
 		testmode = 1
 		nomicro=args.nomicro
