@@ -93,7 +93,7 @@ if __name__=='__main__':
 			if ( testmode == 1 and count > int(nomicro) ):
 				print("Finish test mode")
 				break
-			count += i
+			count += 1
 			partandstack=record[imagecol].split('@')
 			helicaltubeid = record[helicaltubeidcol]
 			basename = os.path.basename(partandstack[1])
