@@ -94,7 +94,7 @@ if __name__=='__main__':
 	newmt=0
 	nparts=0 # for every line in starfile
 	count = 1
-	partclass = 1
+	partclass = 0
 	for line in instar:
 		# Control for test mode
 		if ( testmode == 1 and count > int(nomicro) ):
