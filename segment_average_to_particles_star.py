@@ -52,39 +52,51 @@ def starcol_exact_label(starlabels, label):
 
 if __name__=='__main__':
 	# get name of input starfile, output starfile, output stack file
-	#parser = argparse.ArgumentParser(description='Create a single stack from particles specified in a starfile')
-	#parser.add_argument('--istar', help='Input starfile from which to get particle information',required=True)
-	#parser.add_argument('--ostar', help='Output starfile with corrected file name for particle stack',required=True)
-	#parser.add_argument('--ostack', help='Output particle stack containing only particles in starfile',required=True)
-	#args = parser.parse_args()
-	# open input star, output star, output stack
-	#with open(args.istar,'r') as instar, open (args.ostar,'w') as avgstar, open(args.ostack,'wb') as outstack:
-		# prepare a temporary header for output stack
-avgstar = open ( 'Class3D/job270/run_it003_data.star', 'r')
-	indir = "wf2/Xform2/"
-	partstar = open("wf2/Xform2/particles.star", 'w')
+	parser = argparse.ArgumentParser(description='Create particle star files from the segment average')
+	parser.add_argument('--istar', help='Input segment average star file',required=True)
+	parser.add_argument('--imtstardir', help='Directory of microtubule star directory (E.g.: Avg2D)',required=True)
+	parser.add_argument('--ostar', help='Output particle star file',required=True)
+	parser.add_argument('--nomicro', help='Test mode for only this number of micrograph',required=False)
+	
+	if args.nomicro is not None:
+		testmode = 1
+		nomicro=args.nomicro
+		print("Operating in test mode for " + args.nomicro + " micrographs")
+	else:
+		testmode = 0
+		print("Operating for the whole dataset")
+		
+	avgstar = open(args.istar , 'r')
+	indir = args.imtstardir
+	partstar = open(args.ostar, 'w')
+	
 	starlabels = learnstarheader(avgstar)
 	writestarheader(partstar, starlabels)
 	# Column definition
-	helicaltubeidcol=2
-	imagecol=7
-	anglerotcol=25
-	angletiltcol=26
-	anglepsicol=27
-	originxcol=22
-	originycol=23
-	anglepsipriorcol=4
-	angletiltpriorcol=3
+	helicaltubeidcol = starcol_exact_label(starlabels, '_rlnHelicalTubeID')
+	imagecol =  starcol_exact_label(starlabels, '_rlnImageName')
+	anglerotcol = starcol_exact_label(starlabels, '_rlnAngleRot')
+	angletiltcol = starcol_exact_label(starlabels, '_rlnAngleTilt')
+	anglepsicol = starcol_exact_label(starlabels, '_rlnAnglePsi')
+	originxcol = starcol_exact_label(starlabels, '_rlnOriginX')
+	originycol = starcol_exact_label(starlabels, '_rlnOriginY')
+	anglepsipriorcol = starcol_exact_label(starlabels, '_rlnAnglePsiPrior')
+	angletiltpriorcol = starcol_exact_label(starlabels, '_rlnAngleTiltPrior')
 
-	nparts=0 # for every line in starfile
+	count = 1 # for every line in starfile
 	for line in avgstar:
 		record = line.split()
 		if len(record)==len(starlabels): # if line looks valid
+			# Control for test mode
+			if ( testmode == 1 and count > int(nomicro) ):
+				print("Finish test mode")
+				break
+			count += i
 			partandstack=record[imagecol].split('@')
 			helicaltubeid = record[helicaltubeidcol]
 			basename = os.path.basename(partandstack[1])
-		basename = str.replace(basename, "_avg.mrcs", "");
-		print(basename)
+			basename = str.replace(basename, "_avg.mrcs", "");
+			print(basename)
 			# write a record to the new starfile
 			instar=open(indir + basename +  ".star", 'r')
 			for item in instar:
@@ -99,13 +111,5 @@ avgstar = open ( 'Class3D/job270/run_it003_data.star', 'r')
 					partrecord[anglepsipriorcol]=record[anglepsipriorcol]
 					writestarline(partstar,partrecord)
 			instar.close()
-			#record[imagecol] =str(1).zfill(6)+'@'+ str.replace(starfile, ".star", "_avg.mrcs")
-			#print("{:.6f}".format(0))
-			#record[psipriorcol] = "{:.6f}".format(0) 
-			# Write a trim record to 24 column only
-			#writestarline(avgstar,record[:24])
-			#instar.close()
-			#break
-
 	partstar.close()
 	avgstar.close()
