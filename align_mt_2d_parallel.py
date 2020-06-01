@@ -6,6 +6,7 @@
 # HB 2020/05/30
 
 import os, sys, argparse, shutil, os.path, glob, string
+import multiprocessing as mp
 from shutil import copyfile
 
 # Global variable
@@ -66,11 +67,13 @@ if __name__=='__main__':
 	parser.add_argument('--idir', help='Input dir for microtubule star file',required=True)
 	parser.add_argument('--odir', help='Output dir for MT star files',required=True)
 	parser.add_argument('--min_particles', help='Minium number of particles',required=False,default=10)
+	parser.add_argument('--j', help='Number of threads',required=False,default=4)
 	parser.add_argument('--nomicro', help='Test mode for only this number of micrographs',required=False)
 
 	args = parser.parse_args()
 	
 	min_part = int(args.min_particles)
+	nocpu = int(args.j)
 
 	if args.nomicro is not None:
 		testmode = 1
@@ -82,19 +85,26 @@ if __name__=='__main__':
 
 	liststar=glob.glob(args.idir + "/*MT*.star")
 	outdir = args.odir
-
+	
+	if ( testmode == 1 ):
+		liststar = liststar[:nomicro]
+		
 	try:
 		os.mkdir( outdir, 0755 );
 	except:
 		print("Output directory exist")
 	
-	count = 1
+	# Start parallel processing
+	pool = mp.Pool(nocpu)
+	
+	pool.map(align2d, liststar, 1) 
+	
+	# Done parallel processing
+	pool.close()
+	pool.join()
+
+	
 	for starfile in liststar:
-		# Control for test mode
-		if ( testmode == 1 and count > int(nomicro) ):
-			print("Finish test mode")
-			break	
-		count += 1
 		basename = os.path.basename(starfile)
         	basename = string.replace(basename, ".star", "")
 		# Check if output exists
