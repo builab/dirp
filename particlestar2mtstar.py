@@ -124,9 +124,7 @@ if __name__=='__main__':
 			if adjustpsi == 1:
 				newpsi = float(record[psicol]) - float(record[psipriorcol])
 				record[psicol] = "{:.6f}".format(newpsi) 
-				writestarline(outstar, record)
-			else:
-				writestarline(outstar, record)
+			writestarline(outstar, record)
 			newmt = 0
 
 	instar.close()
