@@ -25,11 +25,11 @@ def align2d(starfile):
 	# Check if output exists
 	if os.path.exists(outdir + "/" + basename + ".star"):
 		print("Skip " + starfile + " due to output exists")
-		continue
+		return
 	# Check if the min_particle statisfy, otherwise skip
 	if starcountparticles(starfile) < min_part:
 		print("Skip " + starfile + " due to minimum particles not pass" )
-		continue
+		return
 	alndir = outdir + "/" + basename
 	try:
 		os.mkdir( alndir, 0755 );
