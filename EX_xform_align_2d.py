@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # Python script to transform and average particles after reextraction
 # Create also star file of the average microtubule
 # Experimental script to create average of each class from 2d file
