@@ -18,7 +18,7 @@ def applytransformation(instar, outputrootname):
 def splitstarclass(instar):
 	"""Split star file into sub-star file base on class number"""
 	instarhandle = open(instar, 'r')
-	starlabels = learnstarheader(instar)
+	starlabels = learnstarheader(instarhandle)
 	classnocol = starcol_exact_label(starlabels, '_rlnClassNumber')
 	classlist=[]
 	firstline = 1
