@@ -30,7 +30,7 @@ def splitstarclass(instar):
 			else:
 				data = append(data, [record], 0)
 			firstline = 0
-			classlist.append(init(record[classnocol]))
+			classlist.append(int(record[classnocol]))
 	instarhandle.close()
 	classno = np.unique(classlist)
 	for row in data:
