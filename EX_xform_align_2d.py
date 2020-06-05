@@ -179,7 +179,7 @@ if __name__=='__main__':
 				partandstack=record[imagecol].split('@')
 				# write a record to the new starfile
 				classno = record[classnocol]
-				record[imagecol] =str(1).zfill(6)+'@'+ str.replace(starfile, ".star", "_C" + classno +  ".mrcs")
+				record[imagecol] =str(1).zfill(6)+'@'+ str.replace(starfile, ".star", ".mrcs")
 				# Write a trim record to 24 column only
 				writestarline(outstar,record)
 				instar.close()
