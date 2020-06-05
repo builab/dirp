@@ -26,7 +26,7 @@ def splitstarclass(instar):
 			classlist.append(init(record[classnocol]))
 	instarhandle.close()
 	classno = np.unique(classlist)
-	print(f'Updated Fruits List {fruits}')
+	print(f'Class List {classno}')
 					
 	
 def averagestack(instack, outstack):
