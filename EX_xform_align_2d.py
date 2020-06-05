@@ -147,12 +147,9 @@ if __name__=='__main__':
 		count += 1
 		basename = os.path.basename(starfile)
 		basename = string.replace(basename, ".star", "")
-		splitstarclass(outdir + "/" + basename + ".star")
-
 		applytransformation(starfile, outdir + "/" + basename)	
-		averagestack(outdir + "/" + basename + ".mrcs", outdir + "/" + basename + "_avg.mrcs")
+		splitstarclass(outdir + "/" + basename + ".star")
 		
-	sys.exit(0)
 	# Create average star file
 	print ("Create output " + args.ostar + " from " + outdir + "/*.star")
 	listxformstar=glob.glob(outdir + "/*.star")
