@@ -20,7 +20,7 @@ def splitstarclass(instar): # Very bad with big star file
 	instarhandle = open(instar, 'r')
 	starlabels = learnstarheader(instarhandle)
 	classnocol = starcol_exact_label(starlabels, '_rlnClassNumber')
-	classlist=[]
+	classlist=np.array([])
 	firstline = 1
 	for line in instarhandle:
 		record = line.split()
@@ -34,7 +34,8 @@ def splitstarclass(instar): # Very bad with big star file
 	instarhandle.close()
 	classno = np.unique(classlist)
 	index = np.where(classlist == 1)
-	print(index)
+	print(classlist)
+	print(len(index))
 					
 	
 def averagestack(instack, outstack):
