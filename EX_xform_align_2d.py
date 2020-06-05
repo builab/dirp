@@ -142,7 +142,7 @@ if __name__=='__main__':
 		basename = os.path.basename(starfile)
 		basename = string.replace(basename, ".star", "")
 		applytransformation(starfile, outdir + "/" + basename)	
-		splitstarclass(outdir + "/" + basename + ".star)
+		splitstarclass(outdir + "/" + basename + ".star")
 		averagestack(outdir + "/" + basename + ".mrcs", outdir + "/" + basename + "_avg.mrcs")
 		
 	sys.exit(0)
