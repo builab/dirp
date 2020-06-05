@@ -36,7 +36,7 @@ def splitstarclass(instar): # Very bad with big star file
 	print(classlist)
 	print(classlist[classlist == 1])
 	print("Their indices are ", np.nonzero(classlist == 1))
-	print(data)
+	print(data[classlist == 1])
 					
 	
 def averagestack(instack, outstack):
