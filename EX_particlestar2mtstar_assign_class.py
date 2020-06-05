@@ -3,7 +3,7 @@
 # Main code coming from John Rubinstein createstackfromstar.py
 # HB 2020/05/29 Tested & verified
 # 2020/05/31 Add option to adjust psi based on psi prior before split
-# Experimental, assign class 1, 2, 3
+# Experimental, assign class 1, 2, 3 (Tested)
 
 import os, sys, argparse, shutil, os.path, glob, string
 
