@@ -15,7 +15,7 @@ def applytransformation(instar, outputrootname):
 	os.system(transform2d)
 
 
-def splitstarclass(instar):
+def splitstarclass(instar): # Very bad with big star file
 	"""Split star file into sub-star file base on class number"""
 	instarhandle = open(instar, 'r')
 	starlabels = learnstarheader(instarhandle)
@@ -33,10 +33,12 @@ def splitstarclass(instar):
 			classlist.append(int(record[classnocol]))
 	instarhandle.close()
 	classno = np.unique(classlist)
-	for row in data:
-		for val in row:
-			print(val)
-		print
+	for i in classno:
+		print(i)
+	print
+	for i in classlist:
+		print(i)
+	print
 
     
 					
