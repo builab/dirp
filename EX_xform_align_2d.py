@@ -44,7 +44,7 @@ def splitstarclass(mtstarfile): # Very bad with big star file
 		for j in range(len(classdata)):
 			writestarline(outstar, classdata[j])
 		outstar.close()
-		averagestack(outstarname + ".star", outstarname + ".mrcs")
+		averagestack(outstarbasename + ".star", outstarbasename + ".mrcs")
 					
 	
 def averagestack(starfile, outstack):
