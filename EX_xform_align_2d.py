@@ -34,11 +34,7 @@ def splitstarclass(instar): # Very bad with big star file
 	instarhandle.close()
 	classno = np.unique(classlist)
 	index = np.where(classlist == 1)
-	for i in index[0]:
-		print i
-	print
-
-    
+	print(index)
 					
 	
 def averagestack(instack, outstack):
