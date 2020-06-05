@@ -36,17 +36,20 @@ def splitstarclass(mtstarfile): # Very bad with big star file
 	instarhandle.close()
 	classno = np.unique(classlist)
 	for i in classno:
-		outstar = open(outdir + "/" + basename + "_C" + str(int(i)) + ".star", 'w')
+		outstarbasename = outdir + "/" + basename + "_C" + str(int(i))
+		print("Writing " + outstarname + ".star")
+		outstar = open(outstarbasename + ".star", 'w')
 		writestarheader(outstar, starlabels)
 		classdata = data[classlist == i]
 		for j in range(len(classdata)):
 			writestarline(outstar, classdata[j])
 		outstar.close()
+		averagestack(outstarname + ".star", outstarname + ".mrcs")
 					
 	
-def averagestack(instack, outstack):
+def averagestack(starfile, outstack):
 	"""Average stack"""
-	average2d = "relion_image_handler --i " + instack + " --o " + outstack + " --average"
+	average2d = "relion_image_handler --i " + starfile + " --o " + outstack + " --average"
 	print(average2d)
 	os.system(average2d)
 	
@@ -144,8 +147,9 @@ if __name__=='__main__':
 		count += 1
 		basename = os.path.basename(starfile)
 		basename = string.replace(basename, ".star", "")
-		applytransformation(starfile, outdir + "/" + basename)	
 		splitstarclass(outdir + "/" + basename + ".star")
+
+		applytransformation(starfile, outdir + "/" + basename)	
 		averagestack(outdir + "/" + basename + ".mrcs", outdir + "/" + basename + "_avg.mrcs")
 		
 	sys.exit(0)
