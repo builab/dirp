@@ -4,6 +4,7 @@
 # Experimental script to create average of each class from 2d file
 
 import os, sys, argparse, shutil, os.path, glob, string
+import numpy as np
 from shutil import copyfile
 
 def applytransformation(instar, outputrootname):		  
@@ -11,6 +12,22 @@ def applytransformation(instar, outputrootname):
 	transform2d = "relion_stack_create --i " + instar + " --o " + outputrootname + " --apply_transformation"
 	print(transform2d)
 	os.system(transform2d)
+
+
+def splitstarclass(instar):
+	"""Split star file into sub-star file base on class number"""
+	instarhandle = open(instar, 'r')
+	starlabels = learnstarheader(instar)
+	classnocol = starcol_exact_label(starlabels, '_rlnClassNumber')
+	classlist=[]
+	for line in instarhandle:
+		record = line.split()
+		if len(record)==len(starlabels): # if line looks valid
+			classlist.append(init(record[classnocol]))
+	instarhandle.close()
+	classno = np.unique(classlist)
+	print(f'Updated Fruits List {fruits}')
+					
 	
 def averagestack(instack, outstack):
 	"""Average stack"""
@@ -112,7 +129,8 @@ if __name__=='__main__':
 		count += 1
 		basename = os.path.basename(starfile)
         	basename = string.replace(basename, ".star", "")
-		applytransformation(starfile, outdir + "/" + basename)		
+		applytransformation(starfile, outdir + "/" + basename)	
+		splitstarclass(outdir + "/" + basename + ".star)
 		averagestack(outdir + "/" + basename + ".mrcs", outdir + "/" + basename + "_avg.mrcs")
 		
 	sys.exit(0)
