@@ -140,7 +140,7 @@ if __name__=='__main__':
 			break
 		count += 1
 		basename = os.path.basename(starfile)
-        	basename = string.replace(basename, ".star", "")
+		basename = string.replace(basename, ".star", "")
 		applytransformation(starfile, outdir + "/" + basename)	
 		splitstarclass(outdir + "/" + basename + ".star)
 		averagestack(outdir + "/" + basename + ".mrcs", outdir + "/" + basename + "_avg.mrcs")
