@@ -15,9 +15,11 @@ def applytransformation(instar, outputrootname):
 	os.system(transform2d)
 
 
-def splitstarclass(instar): # Very bad with big star file
+def splitstarclass(mtstarfile): # Very bad with big star file
 	"""Split star file into sub-star file base on class number"""
-	instarhandle = open(instar, 'r')
+	basename = os.path.basename(mtstarfile)
+	basename = string.replace(basename, ".star", "")
+	instarhandle = open(mtstarfile, 'r')
 	starlabels = learnstarheader(instarhandle)
 	classnocol = starcol_exact_label(starlabels, '_rlnClassNumber')
 	classlist=np.array([])
@@ -34,8 +36,12 @@ def splitstarclass(instar): # Very bad with big star file
 	instarhandle.close()
 	classno = np.unique(classlist)
 	for i in classno:
-		print(i)
-		print(data[classlist == i])
+		outstar = open(outdir + "/" + basename + "_C" + i + ".star", 'w')
+		writestarheader(outstar, starlabels)
+		classdata = data[classlist == i]
+		for j in range(len(classdata))
+			writestarline(outstar, classdata[j])
+		outstar.close()
 					
 	
 def averagestack(instack, outstack):
