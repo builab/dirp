@@ -5,6 +5,7 @@
 
 import os, sys, argparse, shutil, os.path, glob, string
 import numpy as np
+from numpy import *
 from shutil import copyfile
 
 def applytransformation(instar, outputrootname):		  
@@ -20,13 +21,24 @@ def splitstarclass(instar):
 	starlabels = learnstarheader(instar)
 	classnocol = starcol_exact_label(starlabels, '_rlnClassNumber')
 	classlist=[]
+	firstline = 1
 	for line in instarhandle:
 		record = line.split()
 		if len(record)==len(starlabels): # if line looks valid
+			if firstline == 1:
+				data = [record]
+			else:
+				data = append(data, [record], 0)
+			firstline = 0
 			classlist.append(init(record[classnocol]))
 	instarhandle.close()
 	classno = np.unique(classlist)
 	print(f'Class List {classno}')
+	for row in data:
+		for val in row:
+			print '{:10}'.format(val),
+		print
+    
 					
 	
 def averagestack(instack, outstack):
