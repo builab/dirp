@@ -39,7 +39,7 @@ def splitstarclass(mtstarfile): # Very bad with big star file
 		outstar = open(outdir + "/" + basename + "_C" + i + ".star", 'w')
 		writestarheader(outstar, starlabels)
 		classdata = data[classlist == i]
-		for j in range(len(classdata))
+		for j in range(len(classdata)):
 			writestarline(outstar, classdata[j])
 		outstar.close()
 					
