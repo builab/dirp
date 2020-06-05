@@ -150,16 +150,18 @@ if __name__=='__main__':
 		applytransformation(starfile, outdir + "/" + basename)	
 		splitstarclass(outdir + "/" + basename + ".star")
 		
-	# Create average star file
-	print ("Create output " + args.ostar + " from " + outdir + "/*.star")
-	listxformstar=glob.glob(outdir + "/*.star")
+	# Create average star file from class star file
+	print ("Create output " + args.ostar + " from " + outdir + "/*_C*.star")
+	listxformstar=glob.glob(outdir + "/*_C*.star")
 	starfile = listxformstar[0]
 	outstar = open(args.ostar, 'w')
 	instar = open ( starfile, 'r')
 	starlabels = learnstarheader(instar)
+	imagecol = starcol_exact_label(starlabels, '_rlnImageName')
+	classnocol = starcol_exact_label(starlabels, '_rlnClassNumber')
 	instar.close()
 	# write new trimmed (24 col) output starfile header
-	writestarheader(outstar, starlabels[:24])   
+	writestarheader(outstar, starlabels)   
 	
 	count = 1
 	for starfile in listxformstar:
@@ -171,15 +173,15 @@ if __name__=='__main__':
 		instar = open ( starfile, 'r' )
 		# learn the starfile header and column for image names
 		starlabels=learnstarheader(instar)
-		imagecol = starcol_exact_label(starlabels, '_rlnImageName')
 		for line in instar:
 			record = line.split()
 			if len(record)==len(starlabels): # if line looks valid
 				partandstack=record[imagecol].split('@')
 				# write a record to the new starfile
-				record[imagecol] =str(1).zfill(6)+'@'+ str.replace(starfile, ".star", "_avg.mrcs")
+				classno = record[classnocol]
+				record[imagecol] =str(1).zfill(6)+'@'+ str.replace(starfile, ".star", "_C" + classno +  ".mrcs")
 				# Write a trim record to 24 column only
-				writestarline(outstar,record[:24])
+				writestarline(outstar,record)
 				instar.close()
 				break
 	outstar.close()
