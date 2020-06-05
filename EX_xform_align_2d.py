@@ -35,8 +35,9 @@ def splitstarclass(instar):
 	classno = np.unique(classlist)
 	for row in data:
 		for val in row:
-			print '{:10}'.format(val),
+			print(val)
 		print
+
     
 					
 	
