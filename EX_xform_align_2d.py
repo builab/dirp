@@ -114,7 +114,7 @@ if __name__=='__main__':
 
 	args = parser.parse_args()
 	
-	avgclass = init(args.avgclass)
+	avgclass = int(args.avgclass)
 	
 	if args.nomicro is not None:
 		testmode = 1
