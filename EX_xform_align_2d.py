@@ -26,11 +26,11 @@ def splitstarclass(instar): # Very bad with big star file
 		record = line.split()
 		if len(record)==len(starlabels): # if line looks valid
 			if firstline == 1:
-				data = [record]
+				data = np.array([record])
 			else:
-				data = append(data, [record], 0)
+				data = np.append(data, [record], 0)
 			firstline = 0
-			classlist.append(int(record[classnocol]))
+			classlist = np.append(classlist, [int(record[classnocol])])
 	instarhandle.close()
 	classno = np.unique(classlist)
 	index = np.where(classlist == 1)
