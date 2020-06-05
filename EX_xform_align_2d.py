@@ -36,7 +36,7 @@ def splitstarclass(mtstarfile): # Very bad with big star file
 	instarhandle.close()
 	classno = np.unique(classlist)
 	for i in classno:
-		outstar = open(outdir + "/" + basename + "_C" + "{:d}".format(i) + ".star", 'w')
+		outstar = open(outdir + "/" + basename + "_C" + str(int(i)) + ".star", 'w')
 		writestarheader(outstar, starlabels)
 		classdata = data[classlist == i]
 		for j in range(len(classdata)):
