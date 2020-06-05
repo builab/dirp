@@ -33,11 +33,9 @@ def splitstarclass(instar): # Very bad with big star file
 			classlist.append(int(record[classnocol]))
 	instarhandle.close()
 	classno = np.unique(classlist)
-	for i in classno:
-		print(i)
-	print
-	for i in classlist:
-		print(i)
+	index = np.where(classlist == 1)
+	for i in index:
+		print i
 	print
 
     
