@@ -3,7 +3,7 @@
 # Script to read align star files of filament, recenter and fit new curve 
 # using RANSAC and interpolate new origins
 # Recenter newCoordinateX = CoordinateX + OriginX*binFactor
-# v0.1 Take care of case where constant line & switch X, Y if spread of X is too small
+# v0.3 Take care of case where constant line & switch X, Y if spread of X is too small
 """
 Created on Sat Jun  6 17:35:42 2020
 
@@ -69,7 +69,7 @@ def calculatepsi(pts):
 	return psi
 	#print(psi)
 	
-def ransac_polyfit(x, y, step, filename, threshold = 5, outlierthreshold = 10, switchXYthresh = 20):
+def ransac_polyfit(x, y, step, filename, threshold = 5, outlierthreshold = 5, switchXYthresh = 20):
 	"""RANSAC polyfit"""
 	#%%Taking care of y = Constant first
 	q1y = np.quantile(y, 0.25)
@@ -129,14 +129,17 @@ def ransac_polyfit(x, y, step, filename, threshold = 5, outlierthreshold = 10, s
 	estimator =  RANSACRegressor()
 	model = make_pipeline(PolynomialFeatures(2), estimator)
 	model.fit(x2, y)
-	#%% Filterting outliner. Doesnt seem necessary
+	#%% Filterting outliner. Seem to improve quite well
 	x_plot = x2[:,0]
 	y_plot = model.predict(x2)
-	#y_error = np.abs(y - y_plot)
-	#x_plot = x[y_error < 	outlierthreshold*np.median(y_error)]
-	#y_plot = y_plot[y_error < 	outlierthreshold*np.median(y_error)]
+	y_error = np.abs(y - y_plot)
+	x_plot = x[y_error < 	outlierthreshold*np.median(y_error)]
+	y_plot = y_plot[y_error < 	outlierthreshold*np.median(y_error)]
+	# Train model again
+	#model.fit(x_plot[:,np.newaxis], y_plot)
+	#y_plot = model.predict(x_plot[:,np.newaxis])
 
-	# calculate new origin
+	# calculate new origin (Does not seem to be robust yet)
 	xd = np.diff(x_plot)
 	yd = np.diff(y_plot)
 	dist = np.sqrt(xd**2 + yd**2)
@@ -144,7 +147,8 @@ def ransac_polyfit(x, y, step, filename, threshold = 5, outlierthreshold = 10, s
 	u = np.hstack([[0], u])
 	t = np.arange(0, u.max(), step)
 	xn = np.interp(t, u, x_plot)
-	yn = np.interp(t, u, y_plot)
+	#yn = np.interp(t, u, y_plot) # Old & unreliable
+	yn = model.predict(xn[:,np.newaxis])
 	neworigin = np.vstack([xn, yn])
 
 	if flipud == 1:
@@ -165,23 +169,104 @@ def ransac_polyfit(x, y, step, filename, threshold = 5, outlierthreshold = 10, s
 
 #%%	
  
-def ransac_polyfit2(x, y, step, filename):
-	ransac = RANSACRegressor(PolynomialRegression(degree=2),
-                         residual_threshold=2 * np.std(y),
-                         random_state=0)
-	ransac.fit(np.expand_dims(x, axis=1), y)
-	inlier_mask = ransac.inlier_mask_
-	y_hat = ransac.predict(np.expand_dims(x, axis=1))
-	plt.plot(x, y, 'bx', label='input samples')
-	plt.plot(x[inlier_mask], y[inlier_mask], 'go', label='inliers (2*STD)')
-	plt.plot(x, y_hat, 'r-', label='estimated curve')
-	neworigin = np.vstack([x, y_hat])
+def ransac_polyfit2(x, y, step, filename, threshold = 5, outlierthreshold = 5, interppts = 2000):
+	#%%Taking care of y = Constant first
+	q1y = np.quantile(y, 0.25)
+	q3y = np.quantile(y, 0.75)
+	yq = y[(y>= q1y) & (y <= q3y)]
+	# threshold = Threshold for spread (pixel)
+	# outlierthreshold = 10 # Threshold for eliminate outlier
+	# interppts = 20000 Number of point to interpolate the line
+	if np.std(yq) < threshold:
+		print("WARNING: Y is almost constant")
+		xn = np.arange(x.min(), x.max(), step)
+		yn = np.array(xn)*0 + np.median(y) 
+		neworigin = np.vstack([xn, yn])
+		plt.plot(xn, yn, color='lightgreen', linestyle='--', linewidth=3)
+		plt.plot(xn, yn, 'ro')
+		plt.plot(x, y, 'b+')
+		plt.axis('equal')
+		plt.savefig(str.replace(filename, '.png', '_WARNING.png'))
+		plt.close()
+		return neworigin.T
+	
+	# X = constant
+	q1x = np.quantile(x, 0.25)
+	q3x = np.quantile(x, 0.75)
+	xq = x[(x>= q1x) & (x <= q3x)]
+	if np.std(xq) < threshold:
+		print("WARNING: X is almost constant")
+		yn = np.arange(y.min(), y.max(), step)
+		xn = np.array(yn)*0 + np.median(x) 
+		neworigin = np.vstack([xn, yn])
+		plt.plot(xn, yn, color='lightgreen', linestyle='--', linewidth=3)
+		plt.plot(xn, yn, 'ro')
+		plt.plot(x, y, 'b+')
+		plt.axis('equal')
+		plt.savefig(str.replace(filename, '.png', '_WARNING.png'))
+		plt.close()
+		return neworigin.T
+	
+	# Normal case
+	# Avoid X spread two small, switch X & Y std(X)  < 10
+	fliplr = 0
+	if x[1] > x[-1]:
+		flipud = 1	
+	else:
+		flipud = 0
+	if np.std(xq) < np.std(yq): # This is crucial
+		print('WARNING: Switch XY due to small X spread')
+		fliplr = 1
+		x2 = y[:, np.newaxis]
+		xorig  = x
+		x = y
+		y = xorig
+
+	else:
+		x2 = x[:, np.newaxis]
+		
+	estimator =  RANSACRegressor()
+	model = make_pipeline(PolynomialFeatures(2), estimator)
+	model.fit(x2, y)
+	#%% Filterting outliner. Seem to improve quite well
+	x_plot = x2[:,0]
+	y_plot = model.predict(x2)
+	y_error = np.abs(y - y_plot)
+	x_plot = x[y_error < 	outlierthreshold*np.median(y_error)]
+	y_plot = y_plot[y_error < 	outlierthreshold*np.median(y_error)]
+	# Train model again
+	#model.fit(x_plot[:,np.newaxis], y_plot)
+	#y_plot = model.predict(x_plot[:,np.newaxis])
+
+	# calculate new origin (Does not seem to be robust yet)
+	xi = np.linspace(x_plot.min(), x_plot.max(), interppts)
+	yi = model.predict(xi[:,np.newaxis])
+	xd = np.diff(xi)
+	yd = np.diff(yi)
+	dist = np.sqrt(xd**2 + yd**2)
+	u = np.cumsum(dist)
+	u = np.hstack([[0], u])
+	t = np.arange(0, u.max(), step)
+	indx = np.searchsorted(u, t, side='left')
+	xn = xi[indx]
+	yn = yi[indx]
+	neworigin = np.vstack([xn, yn])
+
+	if flipud == 1:
+		neworigin = np.fliplr(neworigin)
+	if fliplr == 1:
+		neworigin = np.flipud(neworigin)
+		plt.plot(y_plot, x_plot, color='lightgreen', linestyle='--', linewidth=3)
+		plt.plot(yn, xn, 'ro')
+		plt.plot(y, x, 'b+')
+	else:
+		plt.plot(x_plot, y_plot, color='lightgreen', linestyle='--', linewidth=3)
+		plt.plot(xn, yn, 'ro')
+		plt.plot(x, y, 'b+')
 	plt.axis('equal')
 	plt.savefig(filename)
 	plt.close()
-	return neworigin.T
-
- 
+	return neworigin.T 
 
 def learnstarheader(infile):
 	"""Learn which column contains which information from an already open starfile"""
@@ -297,7 +382,7 @@ if __name__=='__main__':
 		
 		instar.close()
 		#print(origin)
-		neworigin = ransac_polyfit(origin[:,0], origin[:,1], step, outdir + "/" + basename + ".png")
+		neworigin = ransac_polyfit2(origin[:,0], origin[:,1], step, outdir + "/" + basename + ".png")
 		psi = calculatepsi(neworigin)
 		#print(psi)
 		
