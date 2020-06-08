@@ -3,7 +3,7 @@
 # Script to read align star files of filament, recenter and fit new curve 
 # using RANSAC and interpolate new origins
 # Recenter newCoordinateX = CoordinateX + OriginX*binFactor
-# TODO: How to eliminate very bad one already
+# v0.1 Take care of case where constant line & switch X, Y if spread of X is too small
 """
 Created on Sat Jun  6 17:35:42 2020
 
@@ -13,16 +13,54 @@ Created on Sat Jun  6 17:35:42 2020
 import os, sys, argparse, os.path, glob, math
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn import linear_model
 from sklearn.linear_model import RANSACRegressor
 from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import make_pipeline
 
+class PolynomialRegression(object):
+    def __init__(self, degree=3, coeffs=None):
+        self.degree = degree
+        self.coeffs = coeffs
+
+    def fit(self, X, y):
+        self.coeffs = np.polyfit(X.ravel(), y, self.degree)
+
+    def get_params(self, deep=False):
+        return {'coeffs': self.coeffs}
+
+    def set_params(self, coeffs=None, random_state=None):
+        self.coeffs = coeffs
+
+    def predict(self, X):
+        poly_eqn = np.poly1d(self.coeffs)
+        y_hat = poly_eqn(X.ravel())
+        return y_hat
+
+    def score(self, X, y):
+        return mean_squared_error(y, self.predict(X))
 	
 def calculatepsi(pts):
 	"""Calculate the psi from the tangent"""
 	x = pts[:,0]
 	y = pts[:,1]
+	threshold = 3
+	# Y axis constant
+	q1y = np.quantile(y, 0.25)
+	q3y = np.quantile(y, 0.75)
+	yq = y[(y>= q1y) & (y <= q3y)]
+	if np.std(yq) < threshold:
+		psi = np.array(y)*0 - 180
+		return psi
+	# X axis constant
+	q1x = np.quantile(x, 0.25)
+	q3x = np.quantile(x, 0.75)
+	xq = x[(x>= q1x) & (x <= q3x)]
+	if np.std(xq) < threshold:
+		psi = np.array(y)*0 - 90
+		return psi
+	# Normal case
 	xd = np.diff(x)
 	yd = np.diff(y)
 	psirad = np.arctan2(yd,xd)*-1
@@ -31,19 +69,73 @@ def calculatepsi(pts):
 	return psi
 	#print(psi)
 	
-def ransac_polyfit(x, y, step, filename):
+def ransac_polyfit(x, y, step, filename, threshold = 5, outlierthreshold = 10, switchXYthresh = 20):
 	"""RANSAC polyfit"""
+	#%%Taking care of y = Constant first
+	q1y = np.quantile(y, 0.25)
+	q3y = np.quantile(y, 0.75)
+	yq = y[(y>= q1y) & (y <= q3y)]
+	# threshold = Threshold for spread (pixel)
+	#outlierthreshold = 10 # Threshold for eliminate outlier
+	# switchXYthresh = 20 if std of X is < 30 pixel, switch XY for robust estimation
+	if np.std(yq) < threshold:
+		print("WARNING: Y is almost constant")
+		xn = np.arange(x.min(), x.max(), step)
+		yn = np.array(xn)*0 + np.median(y) 
+		neworigin = np.vstack([xn, yn])
+		plt.plot(xn, yn, color='lightgreen', linestyle='--', linewidth=3)
+		plt.plot(xn, yn, 'ro')
+		plt.plot(x, y, 'b+')
+		plt.axis('equal')
+		plt.savefig(str.replace(filename, '.png', '_WARNING.png'))
+		plt.close()
+		return neworigin.T
+	
+	# X = constant
+	q1x = np.quantile(x, 0.25)
+	q3x = np.quantile(x, 0.75)
+	xq = x[(x>= q1x) & (x <= q3x)]
+	if np.std(xq) < threshold:
+		print("WARNING: X is almost constant")
+		yn = np.arange(y.min(), y.max(), step)
+		xn = np.array(yn)*0 + np.median(x) 
+		neworigin = np.vstack([xn, yn])
+		plt.plot(xn, yn, color='lightgreen', linestyle='--', linewidth=3)
+		plt.plot(xn, yn, 'ro')
+		plt.plot(x, y, 'b+')
+		plt.axis('equal')
+		plt.savefig(str.replace(filename, '.png', '_WARNING.png'))
+		plt.close()
+		return neworigin.T
+	
+	# Normal case
+	# Avoid X spread two small, switch X & Y std(X)  < 10
+	fliplr = 0
 	if x[1] > x[-1]:
 		flipud = 1	
 	else:
 		flipud = 0
-	x = x[:, np.newaxis]
+	if np.std(xq) < switchXYthresh:
+		print('WARNING: Switch XY due to small X spread')
+		fliplr = 1
+		x2 = y[:, np.newaxis]
+		xorig  = x
+		x = y
+		y = xorig
+
+	else:
+		x2 = x[:, np.newaxis]
+		
 	estimator =  RANSACRegressor()
 	model = make_pipeline(PolynomialFeatures(2), estimator)
-	model.fit(x, y)
-	x_plot = np.linspace(x.min(), x.max())
-	y_plot = model.predict(x_plot[:, np.newaxis])
-	
+	model.fit(x2, y)
+	#%% Filterting outliner. Doesnt seem necessary
+	x_plot = x2[:,0]
+	y_plot = model.predict(x2)
+	#y_error = np.abs(y - y_plot)
+	#x_plot = x[y_error < 	outlierthreshold*np.median(y_error)]
+	#y_plot = y_plot[y_error < 	outlierthreshold*np.median(y_error)]
+
 	# calculate new origin
 	xd = np.diff(x_plot)
 	yd = np.diff(y_plot)
@@ -54,39 +146,41 @@ def ransac_polyfit(x, y, step, filename):
 	xn = np.interp(t, u, x_plot)
 	yn = np.interp(t, u, y_plot)
 	neworigin = np.vstack([xn, yn])
-	plt.plot(x_plot, y_plot, color='lightgreen', linestyle='--', linewidth=3)
-	plt.plot(xn, yn, 'ro')
-	plt.plot(x[:, 0], y, 'b+')
-	plt.savefig(filename)
-	plt.close()
+
 	if flipud == 1:
 		neworigin = np.fliplr(neworigin)
+	if fliplr == 1:
+		neworigin = np.flipud(neworigin)
+		plt.plot(y_plot, x_plot, color='lightgreen', linestyle='--', linewidth=3)
+		plt.plot(yn, xn, 'ro')
+		plt.plot(y, x, 'b+')
+	else:
+		plt.plot(x_plot, y_plot, color='lightgreen', linestyle='--', linewidth=3)
+		plt.plot(xn, yn, 'ro')
+		plt.plot(x, y, 'b+')
+	plt.axis('equal')
+	plt.savefig(filename)
+	plt.close()
 	return neworigin.T
-	
+
+#%%	
  
-def ransac_polyfit2(x, y, order=1, n=5, k=100, t=0.1, d=5, f=0.8):
-	# Thanks https://en.wikipedia.org/wiki/Random_sample_consensus
-	
-	# n – minimum number of data points required to fit the model
-	# k – maximum number of iterations allowed in the algorithm
-	# t – threshold value to determine when a data point fits a model
-	# d – number of close data points required to assert that a model fits well to data
-	# f – fraction of close data points required
-	besterr = np.inf
-	bestfit = None
-	for kk in range(k):
-		print(kk)
-		maybeinliers = np.random.randint(len(x), size=n)
-		maybemodel = np.polyfit(x[maybeinliers], y[maybeinliers], order)
-		print(maybemodel)
-		alsoinliers = np.abs(np.polyval(maybemodel, x)-y) < t
-		if sum(alsoinliers) > d and sum(alsoinliers) > len(x)*f:
-			bettermodel = np.polyfit(x[alsoinliers], y[alsoinliers], order)
-			thiserr = np.sum(np.abs(np.polyval(bettermodel, x[alsoinliers])-y[alsoinliers]))
-			if thiserr < besterr:
-				bestfit = bettermodel
-				besterr = thiserr
-	return bestfit
+def ransac_polyfit2(x, y, step, filename):
+	ransac = RANSACRegressor(PolynomialRegression(degree=2),
+                         residual_threshold=2 * np.std(y),
+                         random_state=0)
+	ransac.fit(np.expand_dims(x, axis=1), y)
+	inlier_mask = ransac.inlier_mask_
+	y_hat = ransac.predict(np.expand_dims(x, axis=1))
+	plt.plot(x, y, 'bx', label='input samples')
+	plt.plot(x[inlier_mask], y[inlier_mask], 'go', label='inliers (2*STD)')
+	plt.plot(x, y_hat, 'r-', label='estimated curve')
+	neworigin = np.vstack([x, y_hat])
+	plt.axis('equal')
+	plt.savefig(filename)
+	plt.close()
+	return neworigin.T
+
  
 
 def learnstarheader(infile):
