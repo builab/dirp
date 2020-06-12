@@ -4,6 +4,7 @@
 # HB 2020/05/29 Tested & verified
 # 2020/05/31 Add option to adjust psi based on psi prior before split
 # Experimental, assign class 1, 2, 3 (Tested)
+# Add option to reset psi prior
 
 import os, sys, argparse, shutil, os.path, glob, string
 
@@ -62,12 +63,14 @@ if __name__=='__main__':
 	parser.add_argument('--odir', help='Output dir for MT star files',required=True)
 	parser.add_argument('--adjustpsi', help='Adjust psi based on the psi prior (0 or 1, default 0)',required=False,default=0)
 	parser.add_argument('--noclass', help='Adding class number for averaging',required=False,default=1)
+	parser.add_argument('--resetpsiprior', help='Adding class number for averaging',required=False,default=0)
 	parser.add_argument('--nomicro', help='Test mode for only this number of micrograph',required=False)
 
 	args = parser.parse_args()
 	
 	# Adjust psi is true or not
 	adjustpsi = int(args.adjustpsi)
+	resetpsiprior = int(args.resetpsiprior)
 	noclass = int(args.noclass)
 	
 	if args.nomicro is not None:
@@ -132,6 +135,8 @@ if __name__=='__main__':
 			if adjustpsi == 1:
 				newpsi = float(record[psicol]) - float(record[psipriorcol])
 				record[psicol] = "{:.6f}".format(newpsi) 
+			if resetpsiprior == 1:
+				record[psipriorcol] = "{:.6f}".format(0) 
 			writestarline(outstar, record)
 			newmt = 0
 
