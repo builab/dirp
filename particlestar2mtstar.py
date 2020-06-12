@@ -3,10 +3,9 @@
 # Main code coming from John Rubinstein createstackfromstar.py
 # HB 2020/05/29 Tested & verified
 # 2020/05/31 Add option to adjust psi based on psi prior before split
+# 2020/06/11 Add option to reset psi prior for the new align_2d
 
 import os, sys, argparse, shutil, os.path, glob, string
-
-
 
 def learnstarheader(infile):
 	"""Learn which column contains which information from an already open starfile"""
