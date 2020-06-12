@@ -4,6 +4,7 @@
 # Right now, a lot of hard code but will be refined later
 # If output exist, skip alignment as well
 # HB 2020/05/30 Tested & Verified
+# HB 2020/06/11 Use new parameters & keep the output mrcs file
 
 import os, sys, argparse, shutil, os.path, glob, string
 import multiprocessing as mp
@@ -12,10 +13,10 @@ from shutil import copyfile
 # Global variable
 iter=6
 tau2_fudge=12
-thread=4
+thread=2
 offset_range=10
 helical_outer_diameter=500
-sigma_psi=5
+sigma_psi=3
 
 # Still hard-code the relion command now
 def align2d(starfile):		  
@@ -36,13 +37,14 @@ def align2d(starfile):
 	except:
 		print( alndir + " exists")
 	# Perform alignment
-	align2d = "relion_refine --i " + starfile + " --o " + alndir + "/" + basename + " --dont_combine_weights_via_disc --no_parallel_disc_io --preread_images --pool 200 --pad 2 --ctf --iter 6 --tau2_fudge 12 --particle_diameter 600 --K 1 --flatten_solvent --oversampling 1 --psi_step 2 --offset_range 10 --offset_step 2 --helical_outer_diameter 500 --sigma_psi 5 --dont_check_norm --norm --scale --j 4"
+	align2d = "relion_refine --i " + starfile + " --o " + alndir + "/" + basename + " --dont_combine_weights_via_disc --no_parallel_disc_io --preread_images --pool 200 --pad 2 --ctf --iter 6 --tau2_fudge 12 --particle_diameter 800 --K 1 --flatten_solvent --oversampling 1 --psi_step 1 --offset_range 10 --offset_step 1 --helical_outer_diameter 600 --sigma_psi 3 --dont_check_norm --norm --scale --j " + thread
 	print(align2d)
 	os.system(align2d)
 	outstar =  alndir + "/" + basename + "_it006_data.star"
 	outmrc = alndir + "/" + basename + "_it006_classes.mrcs"
 	try:
 		shutil.copyfile(outstar, outdir + "/" + basename + ".star")
+		shutil.copyfile(outmrc, outdir + "/" + basename + ".mrcs")
 	except:	
 		print("Error copying file " + outstar)
 	try:
