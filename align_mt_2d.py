@@ -4,22 +4,25 @@
 # Right now, a lot of hard code but will be refined later
 # If output exist, skip alignment as well
 # HB 2020/05/30
+# HB 2020/06/11 Now, use small search range, larger particle diameter & keep the mrcs file
 
 import os, sys, argparse, shutil, os.path, glob, string
 from shutil import copyfile
 
-# Global variable
+# Global variable (Not used now but good to reference)
 iter=6
 tau2_fudge=12
 thread=4
 offset_range=10
-helical_outer_diameter=500
-sigma_psi=5
+helical_outer_diameter=600
+
+sigma_psi=3
 
 # Still hard-code the relion command now
 def align2d(starfile, outprefix):		  
 	"""Performing align 2d of mt star file using relion"""
-	align2d = "relion_refine --i " + starfile + " --o " + outprefix + " --dont_combine_weights_via_disc --no_parallel_disc_io --preread_images --pool 200 --pad 2 --ctf --iter 6 --tau2_fudge 12 --particle_diameter 600 --K 1 --flatten_solvent --oversampling 1 --psi_step 2 --offset_range 10 --offset_step 2 --helical_outer_diameter 500 --sigma_psi 5 --dont_check_norm --norm --scale --j 4"
+	# Hardcode for now
+	align2d = "relion_refine --i " + starfile + " --o " + outprefix + " --dont_combine_weights_via_disc --no_parallel_disc_io --preread_images --pool 200 --pad 2 --ctf --iter 6 --tau2_fudge 12 --particle_diameter 800 --K 1 --flatten_solvent --oversampling 1 --psi_step 1 --offset_range 10 --offset_step 1 --helical_outer_diameter 600 --sigma_psi 3 --dont_check_norm --norm --scale --j 4"
 	print(align2d)
 	os.system(align2d)
 	
@@ -116,6 +119,7 @@ if __name__=='__main__':
 		outmrc = alndir + "/" + basename + "_it006_classes.mrcs"
 		try:
 			shutil.copyfile(outstar, outdir + "/" + basename + ".star")
+			shutil.copyfile(outmrc, outdir + "/" + basename + ".mrcs")
 		except:	
 			print("Error copying file " + outstar)
 		try:
