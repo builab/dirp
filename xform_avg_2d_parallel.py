@@ -132,7 +132,7 @@ if __name__=='__main__':
 	starlabels = learnstarheader(instar)
 	instar.close()
 	# write new trimmed (24 col) output starfile header
-	writestarheader(outstar, starlabels[:24])   
+	writestarheader(outstar, starlabels)   
 	
 	count = 1
 	for starfile in listxformstar:
@@ -152,7 +152,7 @@ if __name__=='__main__':
 				# write a record to the new starfile
 				record[imagecol] =str(1).zfill(6)+'@'+ str.replace(starfile, ".star", "_avg.mrcs")
 				# Write a trim record to 24 column only
-				writestarline(outstar,record[:24])
+				writestarline(outstar,record)
 				instar.close()
 				break
 	outstar.close()
