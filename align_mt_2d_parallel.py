@@ -46,7 +46,7 @@ def align2d(starfile):
 	outmrc = alndir + "/" + basename + "_it006_classes.mrcs"
 	try:
 		shutil.copyfile(outstar, outdir + "/" + basename + ".star")
-		shutil.copyfile(outmrc, outdir + "/" + basename + ".mrcs")
+		shutil.copyfile(outmrc, outdir + "/" + basename + "_avg.mrcs")
 	except:	
 		print("Error copying file " + outstar)
 	try:
