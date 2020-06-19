@@ -3,6 +3,7 @@
 """
 Created on Fri Jun 19 13:19:02 2020
 Script sequentially run through a list of mparameters file in Frealign
+Doesn't work. Check frealign_kill script later
 @author: kbui2
 """
 
