@@ -15,8 +15,8 @@ def launchfrealign():
 	process = subprocess.Popen(['frealign_run_refine', ''])
 	return process
 
-def checkprocessrunning(pid):
-	if os.path.exists('/proc/' + str(pid)):
+def checkfrealignrunning():
+	if os.path.exists('scratch/pid.log' ):
 		return 1
 	else:
 		return 0
@@ -34,13 +34,11 @@ if __name__ == "__main__":
 		shutil.copy(mparamlist[i], 'mparameters')
 		process = launchfrealign()
 		while True:
-			if checkprocessrunning(process.pid) == 1:
-				print('Process ' + str(process.pid) + ' still alive ' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+			if checkprocessrunning() == 1:
+				print('Frealign still alive ' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 			else:
-				print('Process ' + str(process.pid) + ' done')
+				print('Frealign done')
 				break
 			time.sleep(interval)
 			
-		
-		
 		
