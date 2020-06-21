@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Script to read align star files of filament, recenter and fit new curve 
-# using RANSAC and interpolate new origins
-# Recenter newCoordinateX = CoordinateX + OriginX*binFactor
-# v0.3 Take care of case where constant line & switch X, Y if spread of X is too small
-# Take care of segID unique in spider
+# Script to read convert star files of filament to spider file for IHRSR
+# 2020/06/19 Use IHRSR angle interpolation -atan2(x,y) instead of -atan2(y,x) like Relion. Also rot = 0-360 in IHRSR
+# 2020/06/20 Take care of segID unique in spider
 # 2020/06/21 Take care of specific name, required micrograph name xxx_01245.mrc
 """
 Created on Sat Jun  6 17:35:42 2020
@@ -124,6 +122,7 @@ if __name__=='__main__':
 			line2[10] = "{:.6f}".format(1)
 			line2[11] = record[ctfmeritcol]
 			writestarline(outspider,line2)
+			count += 1
 				
 	instar.close()
 	outspider.close()
