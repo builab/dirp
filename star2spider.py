@@ -5,16 +5,14 @@
 # Recenter newCoordinateX = CoordinateX + OriginX*binFactor
 # v0.3 Take care of case where constant line & switch X, Y if spread of X is too small
 # Take care of segID unique in spider
+# 2020/06/21 Take care of specific name, required micrograph name xxx_01245.mrc
 """
 Created on Sat Jun  6 17:35:42 2020
 
 @author: kbui2
 """
 
-import os, sys, argparse, os.path, glob, math, string
-import matplotlib.pyplot as plt
-import numpy as np
-
+import os, argparse, os.path, re
 
 
 def learnstarheader(infile):
@@ -99,8 +97,8 @@ if __name__=='__main__':
 		if len(record)==len(starlabels): # if line looks valid
 			microname=record[microcol]
 			micronum = os.path.basename(microname)
-			micronum = str.replace(micronum, '.mrc', '')
-			micronum = str.replace(micronum, 'tt_wt_dmt_', '')
+			micronum = re.sub('.*_(\d\d\d\d\d).mrc', '\\1', micronum)
+			print(micronum)
 			micronum = int(micronum)
 			#print(record[psipriorcol])
 			if microname != prevmicroname:
@@ -116,7 +114,7 @@ if __name__=='__main__':
 			line2[1] = str(10)
 			line2[0] = str(count)
 			line2[2] = str(micronum)
-			line2[3] = helicalid
+			line2[3] = str(helicalid)
 			line2[4] = record[coorxcol]
 			line2[5] = record[coorycol]
 			line2[6] = "{:.6f}".format(-float(record[psipriorcol]))
