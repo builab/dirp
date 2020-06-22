@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # Script to read aligned frealign par file & original star file
 # Convert into new star file
+# 2020/06/24 fix convert frealign to relion -shx/apix, -shy/apix
 
 
 import argparse
@@ -90,7 +91,6 @@ if __name__=='__main__':
 	parser.add_argument('--ipar', help='Input par file',required=True)
 	parser.add_argument('--istar', help='Input segment star file',required=True)
 	parser.add_argument('--ostar', help='Corresponding output star file',required=True)
-	#parser.add_argument('--nomicro', help='Test mode for only this number of micrographs',required=False)
 
 	args = parser.parse_args()
 	
@@ -124,8 +124,8 @@ if __name__=='__main__':
 		if len(record)==len(starlabels): # if line looks valid
 				# Star file
 				angpix = float(record[pixelsizecol])
-				record[orixcol] = "{:.6f}".format(data[npart,4]/angpix)
-				record[oriycol] = "{:.6f}".format(data[npart,5]/angpix)
+				record[orixcol] = "{:.6f}".format(-data[npart,4]/angpix)
+				record[oriycol] = "{:.6f}".format(-data[npart,5]/angpix)
 				record[psipriorcol] = "{:.6f}".format(data[npart,1])
 				record[tiltpriorcol] = "{:.6f}".format(data[npart,2])
 				record[rotcol] = "{:.6f}".format(data[npart,3])
