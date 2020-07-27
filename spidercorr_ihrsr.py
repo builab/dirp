@@ -7,8 +7,6 @@
 import os, sys, argparse, math
 import numpy as np
 
-
-
 def readspiderfile(infile):
 	"""The whole spider file content into an np array of float"""
 	data = np.loadtxt(infile, dtype='float', comments=';')
@@ -17,28 +15,31 @@ def readspiderfile(infile):
 def writespiderline(outfile, records):
 	"""Write a record (line) to an already open starfile"""
 	FORMAT = "%7d %7d %8.2f %8.2f %8.2f %8.2f %8.2f %8.2f %8.2f %8.2f %8.2f %8.2f\n"
-	outfile.write(FORMAT%(records[0],records[1],records[2],records[3],records[4],records[5],records[6],records[7],records[8],records[9],records[10]))
+	outfile.write(FORMAT%(records[0],records[1],records[2],records[3],records[4],records[5],records[6],records[7],records[8],records[9],records[10], records[11]))
 		
 	
 if __name__=='__main__':
-	parser = argparse.ArgumentParser(description='Convert spider alignment to frealign and star')
+	# get name of input starfile, output starfile, output stack file
+	parser = argparse.ArgumentParser(description='Convert spider doc to IHRSR format')
 	parser.add_argument('--ispider', help='Input spider file',required=True)
-	parser.add_argument('--ospider', help='Output IHRSR spider file',required=True)
+	parser.add_argument('--ospider', help='Output spider file',required=True)
 	#parser.add_argument('--nomicro', help='Test mode for only this number of micrographs',required=False)
 
 	args = parser.parse_args()
 	
+
 	
 	data = readspiderfile(args.ispider)
 	outspider = open(args.ospider, 'w')		
 
-	
+	#print(data)
 	# Reading star file header
 	prevseg = 0
 	prevmicro = 0	
-	for npart in len(data):
+	for npart in range(len(data)):
 		if npart == len(data) - 1 :
 			data[npart,6] = data[npart-1,6]
+			writespiderline(outspider,data[npart,:])
 			continue
 		micro = data[npart, 2]
 		seg = data[npart, 3]
@@ -54,7 +55,8 @@ if __name__=='__main__':
 			prevseg = seg
 		else:
 			data[npart, 6] = data[npart -1, 6]
-	writespiderline(outspider,recrod)
+			prevmicro = micro
+			prevseg = seg
+		writespiderline(outspider,data[npart,:])				
 
-							
 	outspider.close()
