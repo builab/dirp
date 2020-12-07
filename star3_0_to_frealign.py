@@ -113,7 +113,7 @@ if __name__=='__main__':
 				prevhelicalid = record[helicalidcol]
 			else:
 				microlist[microname] = micronum
-				micronum =+ 1
+				micronum += 1
 				helicalid += 1
 				prevhelicalid = record[helicalidcol]
 			
