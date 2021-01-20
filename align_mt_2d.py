@@ -5,6 +5,7 @@
 # If output exist, skip alignment as well
 # HB 2020/05/30
 # HB 2020/06/11 Now, use small search range, larger particle diameter & keep the mrcs file
+# Still hardcode-very bad
 
 import os, sys, argparse, shutil, os.path, glob, string
 from shutil import copyfile
