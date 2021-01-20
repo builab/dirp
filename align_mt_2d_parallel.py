@@ -1,10 +1,9 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # Python script to run 2d alignment and create a combine star file with parallelization
 # Realistically, only the combined star file is needed to keep
 # Right now, a lot of hard code but will be refined later
 # If output exist, skip alignment as well
 # HB 2020/05/30 Tested & Verified
-# HB 2020/06/11 Use new parameters & keep the output mrcs file
 
 import os, sys, argparse, shutil, os.path, glob, string
 import multiprocessing as mp
@@ -13,17 +12,16 @@ from shutil import copyfile
 # Global variable
 iter=6
 tau2_fudge=12
-thread=2
+thread=4
 offset_range=10
-particle_diameter=800
-helical_outer_diameter=600
-sigma_psi=3
+helical_outer_diameter=500
+sigma_psi=5
 
 # Still hard-code the relion command now
 def align2d(starfile):		  
 	"""Performing align 2d of mt star file using relion"""
 	basename = os.path.basename(starfile)
-        basename = string.replace(basename, ".star", "")
+	basename = string.replace(basename, ".star", "")
 	# Check if output exists
 	if os.path.exists(outdir + "/" + basename + ".star"):
 		print("Skip " + starfile + " due to output exists")
@@ -34,19 +32,18 @@ def align2d(starfile):
 		return
 	alndir = outdir + "/" + basename
 	try:
-		os.mkdir( alndir, 0755 );
+		os.mkdir( alndir)
 	except:
 		print( alndir + " exists")
 	# Perform alignment
-	align2d = "relion_refine --i " + starfile + " --o " + alndir + "/" + basename + " --dont_combine_weights_via_disc --no_parallel_disc_io --preread_images --pool 200 --pad 2 --ctf --iter 6 --tau2_fudge 12 --particle_diameter 800 --K 1 --flatten_solvent --oversampling 1 --psi_step 1 --offset_range 10 --offset_step 1 --helical_outer_diameter 600 --sigma_psi 3 --dont_check_norm --norm --scale --j " + str(thread)
-	#align2d = "relion_refine --i {} --o {}/{} --dont_combine_weights_via_disc --no_parallel_disc_io --preread_images --pool 200 --pad 2 --ctf --iter {} --tau2_fudge {} --particle_diameter {} --K 1 --flatten_solvent --oversampling 1 --psi_step 1 --offset_range {} --offset_step 1 --helical_outer_diameter {} --sigma_psi {} --dont_check_norm --norm --scale --j {}".format(starfile, alndir, basename, iter, tau_fudge, particle_diameter, offset_range, helical_outer_diameter, sigma_psi, thread)
+		align2d = 'relion_refine --i ' + starfile + ' --o ' + alndir + '/' + basename + ' --dont_combine_weights_via_disc --no_parallel_disc_io --preread_images --pool 200 --pad 2 --ctf --iter 6 --tau2_fudge 12 --particle_diameter 800 --K 1 --flatten_solvent --oversampling 1 --psi_step 1 --offset_range 10 --offset_step 1 --helical_outer_diameter 600 --sigma_psi 5 --dont_check_norm --norm --scale --j' + thread;
 	print(align2d)
 	os.system(align2d)
 	outstar =  alndir + "/" + basename + "_it006_data.star"
 	outmrc = alndir + "/" + basename + "_it006_classes.mrcs"
 	try:
 		shutil.copyfile(outstar, outdir + "/" + basename + ".star")
-		shutil.copyfile(outmrc, outdir + "/" + basename + "_avg.mrcs")
+		shutil.copyfile(outstar, outdir + "/" + basename + "_avg.mrcs")
 	except:	
 		print("Error copying file " + outstar)
 	try:
@@ -121,7 +118,7 @@ if __name__=='__main__':
 		liststar = liststar[:nomicro]
 		
 	try:
-		os.mkdir( outdir, 0755 );
+		os.mkdir( outdir);
 	except:
 		print("Output directory exist")
 	
