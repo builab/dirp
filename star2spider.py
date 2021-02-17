@@ -95,7 +95,10 @@ if __name__=='__main__':
 		if len(record)==len(starlabels): # if line looks valid
 			microname=record[microcol]
 			micronum = os.path.basename(microname)
-			micronum = re.sub('.*_(\d\d\d\d\d).mrc', '\\1', micronum)
+			# This is highly dependent on the micrograph name, need to fix it in the future
+			# Do a temporary fix for now. Asumming file name is xxxx_01234_1-3.mrc
+			#micronum = re.sub('.*_(\d\d\d\d\d).mrc', '\\1', micronum)
+			micronum = re.sub('.*_(\d\d\d\d\d)_\d-\d.mrc', '\\1', micronum)
 			print(micronum)
 			micronum = int(micronum)
 			#print(record[psipriorcol])
