@@ -21,7 +21,7 @@ def learnstarheader(infile):
 	headerlabels = []
 	while not doneprelabels:
 		line=infile.readline()
-		if line.startswith('data_particles')
+		if line.startswith('data_particles'):
 			doneoptics = True
 		if line.startswith('loop_') & doneoptics = True:
 			doneprelabels = True # read until 'loop_'
