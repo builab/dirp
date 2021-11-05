@@ -131,7 +131,7 @@ if __name__=='__main__':
 	# Reading star file header
 	[staroptics, starlabels] = learnstarheader(instar)
 	
-	print(staroptics)
+	#print(staroptics)
 
 	
 	if len(starlabels) < 21:
