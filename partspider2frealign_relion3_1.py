@@ -108,6 +108,7 @@ if __name__=='__main__':
 	parser = argparse.ArgumentParser(description='Convert spider alignment to frealign and star')
 	parser.add_argument('--ispider', help='Input spider file',required=True)
 	parser.add_argument('--istar', help='Input segment star file',required=True)
+	parser.add_argument('--angpix', help='Input particle pixel size',required=True)
 	parser.add_argument('--ofreali', help='Output frealign file',required=True)
 	parser.add_argument('--ostar', help='Corresponding output star file',required=True)
 	#parser.add_argument('--nomicro', help='Test mode for only this number of micrographs',required=False)
@@ -122,24 +123,29 @@ if __name__=='__main__':
 	
 	data = readspiderfile(args.ispider)
 	
+	if is_star3_1(instar) == False:
+		print("WARNING: Script will fail since star file is not in 3.1 format")
+		exit(0)
+	
 	# Reading star file header
 	[staroptics, starlabels] = learnstarheader(instar)
 	
 	print(staroptics)
 
 	
-	if len(starlabels) < 29:
-		starlabels = appendstarlabel(starlabels, '_rlnGroupNumber #25')
-		starlabels = appendstarlabel(starlabels, '_rlnAngleRot #26')
-		starlabels = appendstarlabel(starlabels, '_rlnAngleTilt #27')
-		starlabels = appendstarlabel(starlabels, '_rlnAnglePsi #28')
-		starlabels = appendstarlabel(starlabels, '_rlnClassNumber #29')
+	if len(starlabels) < 21:
+		starlabels = appendstarlabel(starlabels, '_rlnGroupNumber #22')
+		starlabels = appendstarlabel(starlables, '_rlnOriginXAngst #23')
+		starlabels = appendstarlabel(starlables, '_rlnOriginYAngst #24')
+		starlabels = appendstarlabel(starlabels, '_rlnAngleRot #25')
+		starlabels = appendstarlabel(starlabels, '_rlnAngleTilt #26')
+		starlabels = appendstarlabel(starlabels, '_rlnAnglePsi #27')
 	
 	
 	coorxcol = starcol_exact_label(starlabels, '_rlnCoordinateX')
 	coorycol = starcol_exact_label(starlabels, '_rlnCoordinateY')
-	orixcol = starcol_exact_label(starlabels, '_rlnOriginX')
-	oriycol = starcol_exact_label(starlabels, '_rlnOriginY')
+	orixcol = starcol_exact_label(starlabels, '_rlnOriginXAngst')
+	oriycol = starcol_exact_label(starlabels, '_rlnOriginYAngst')
 	tiltpriorcol = starcol_exact_label(starlabels, '_rlnAngleTiltPrior')
 	psipriorcol = starcol_exact_label(starlabels, '_rlnAnglePsiPrior')
 	psicol = starcol_exact_label(starlabels, '_rlnAnglePsi')
@@ -150,7 +156,6 @@ if __name__=='__main__':
 	dfvcol = starcol_exact_label(starlabels, '_rlnDefocusV')
 	dfacol = starcol_exact_label(starlabels, '_rlnDefocusAngle')
 	ctfmeritcol = starcol_exact_label(starlabels, '_rlnCtfFigureOfMerit')
-	pixelsizecol = starcol_exact_label(starlabels, '_rlnDetectorPixelSize')
 	imagecol = starcol_exact_label(starlabels, '_rlnImageName')
 	groupcol = starcol_exact_label(starlabels, '_rlnGroupNumber')
 	classcol = starcol_exact_label(starlabels, '_rlnClassNumber')
@@ -158,7 +163,7 @@ if __name__=='__main__':
 
 
 	
-	writestarheader(outstar, starlabels)
+	writestarheader(outstar, staroptics, starlabels)
 
 	# Write star file header
 	# first file
@@ -176,6 +181,8 @@ if __name__=='__main__':
 	helicalid = 0
 	prevhelicalid = 0
 	prevmicroname = ''
+	pixelsize = float(args.angpix) #3.1
+
 	for line in instar:
 		record = line.split()
 		if len(record) > 10: # if line looks valid
@@ -197,7 +204,6 @@ if __name__=='__main__':
 			shx = -(shx_s*math.cos(psirad) + shy_s*math.sin(psirad))
 			shy = -(-shx_s*math.sin(psirad) + shy_s*math.cos(psirad))
 
-			pixelsize = float(record[pixelsizecol])
 			shx = shx*pixelsize
 			shy = shy*pixelsize
 			
@@ -234,11 +240,13 @@ if __name__=='__main__':
 				
 			record[tiltpriorcol] = "{:.6f}".format(theta)
 			record[psipriorcol] = "{:.6f}".format(psi)
-			record[orixcol] = "{:.6f}".format(-shx/pixelsize)
-			record[oriycol] = "{:.6f}".format(-shy/pixelsize)
+
 			
+			# Check this for 3_1
 			if len(record) < 25:
 				record += ["{:5d}".format(groupnumber)]
+				record += ["{:.6f}".format(-shx)]
+				record += ["{:.6f}".format(-shy)]
 				record += ["{:.6f}".format(phi)]
 				record += ["{:.6f}".format(psi)]
 				record += ["{:.6f}".format(theta)]
@@ -249,7 +257,8 @@ if __name__=='__main__':
 				record[psicol] = "{:.6f}".format(psi)
 				record[tiltcol] = "{:.6f}".format(theta)
 				record[classcol] = "{:5d}".format(1)
-
+				record[orixcol] = "{:.6f}".format(-shx)
+				record[oriycol] = "{:.6f}".format(-shy)
 			
 			
 
