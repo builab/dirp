@@ -77,53 +77,53 @@ def readMRCheader(fname):
     return hdr
 
 def learnstarheader(infile):
-	"""Learn which column contains which information from an already open starfile"""
-	infile.seek(0) # Go to the beginning of the starfile
-	doneheader = False
-	doneprelabels = False
-	headerlabels = []
-	headeroptics = []
+    """Learn which column contains which information from an already open starfile"""
+    infile.seek(0) # Go to the beginning of the starfile
+    doneheader = False
+    doneprelabels = False
+    headerlabels = []
+    headeroptics = []
     doneoptics = True
-	while not doneprelabels:
-		line=infile.readline()
-		# Check if star 3.1 format
-		if line.startswith('data_optics'):
-			doneoptics = False
-		if line.startswith('data_particles'):
-			doneoptics = True
-		if line.startswith('loop_') & doneoptics == True:
-			doneprelabels = True # read until 'loop_'
-		headeroptics += [line]
-	while not doneheader:
-		line=infile.readline()
-		if not line.startswith('_'): # read all lines the start with '_'
-			doneheader = True
-		else:
-			headerlabels += [line] 
-	infile.seek(0) # return to beginning of starfile before return
-	return headeroptics, headerlabels
+    while not doneprelabels:
+        line=infile.readline()
+        # Check if star 3.1 format
+        if line.startswith('data_optics'):
+            doneoptics = False
+        if line.startswith('data_particles'):
+            doneoptics = True
+        if line.startswith('loop_') & doneoptics == True:
+            doneprelabels = True # read until 'loop_'
+            headeroptics += [line]
+    while not doneheader:
+        line=infile.readline()
+        if not line.startswith('_'): # read all lines the start with '_'
+            doneheader = True
+        else:
+            headerlabels += [line] 
+    infile.seek(0) # return to beginning of starfile before return
+    return headeroptics, headerlabels
 
 def is_star3_1(infile):
-	"""Learn starfile is 3.1 or not"""
-	infile.seek(0) # Go to the beginning of the starfile
-	is_star3_1 = False
-	doneheader = False
-	while not doneheader:
-		line=infile.readline()
-		# Check if star 3.1 format
-		if line.startswith('data_optics'):
-			doneheader = True
-			is_star3_1 = True
+    """Learn starfile is 3.1 or not"""
+    infile.seek(0) # Go to the beginning of the starfile
+    is_star3_1 = False
+    doneheader = False
+    while not doneheader:
+        line=infile.readline()
+        # Check if star 3.1 format
+        if line.startswith('data_optics'):
+            doneheader = True
+            is_star3_1 = True
 		
-	infile.seek(0) # return to beginning of starfile before return
-	return is_star3_1
+    infile.seek(0) # return to beginning of starfile before return
+    return is_star3_1
 
 def writestarheader(outfile, headeroptics, headerlabels):		  
-	"""With an already opened starfile write a header"""
-	for label in headeroptics:
-		outfile.write(label)
-	for label in headerlabels:
-		outfile.write(label)
+    """With an already opened starfile write a header"""
+    for label in headeroptics:
+        outfile.write(label)
+    for label in headerlabels:
+        outfile.write(label)
 
 def readstarline(infile):
     """Read a record (line) from an already open starfile and return XXX"""
