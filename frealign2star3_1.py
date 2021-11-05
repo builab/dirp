@@ -15,10 +15,18 @@ def learnstarheader(infile):
 	doneheader = False
 	doneprelabels = False
 	headerlabels = []
+	headeroptics = []
+        doneoptics = True
 	while not doneprelabels:
 		line=infile.readline()
-		if line.startswith('loop_'):
+		# Check if star 3.1 format
+		if line.startswith('data_optics'):
+			doneoptics = False
+		if line.startswith('data_particles'):
+			doneoptics = True
+		if line.startswith('loop_') & doneoptics == True:
 			doneprelabels = True # read until 'loop_'
+		headeroptics += [line]
 	while not doneheader:
 		line=infile.readline()
 		if not line.startswith('_'): # read all lines the start with '_'
@@ -26,11 +34,27 @@ def learnstarheader(infile):
 		else:
 			headerlabels += [line] 
 	infile.seek(0) # return to beginning of starfile before return
-	return headerlabels
+	return headeroptics, headerlabels
 
-def writestarheader(outfile,headerlabels):		  
+def is_star3_1(infile):
+	"""Learn starfile is 3.1 or not"""
+	infile.seek(0) # Go to the beginning of the starfile
+	is_star3_1 = False
+	doneheader = False
+	while not doneheader:
+		line=infile.readline()
+		# Check if star 3.1 format
+		if line.startswith('data_optics'):
+			doneheader = True
+			is_star3_1 = True
+		
+	infile.seek(0) # return to beginning of starfile before return
+	return is_star3_1
+
+def writestarheader(outfile, headeroptics, headerlabels):		  
 	"""With an already opened starfile write a header"""
-	outfile.write('\ndata_\n\nloop_\n')
+	for label in headeroptics:
+		outfile.write(label)
 	for label in headerlabels:
 		outfile.write(label)
 
@@ -100,32 +124,35 @@ if __name__=='__main__':
 	outstar = open(args.ostar, 'w')		
 
 	
-	data = readparfile(args.ipar)
+	
+	if is_star3_1(instar) == False:
+		print("WARNING: Script will fail since star file is not in 3.1 format")
+		exit(0)
 	
 	# Reading star file header
-	starlabels = learnstarheader(instar)
+	[staroptics, starlabels] = learnstarheader(instar)
+	data = readparfile(args.ipar)
 
 	
-	orixcol = starcol_exact_label(starlabels, '_rlnOriginX')
-	oriycol = starcol_exact_label(starlabels, '_rlnOriginY')
+	orixcol = starcol_exact_label(starlabels, '_rlnOriginXAngst')
+	oriycol = starcol_exact_label(starlabels, '_rlnOriginYAngst')
 	tiltpriorcol = starcol_exact_label(starlabels, '_rlnAngleTiltPrior')
 	psipriorcol = starcol_exact_label(starlabels, '_rlnAnglePsiPrior')
 	psicol = starcol_exact_label(starlabels, '_rlnAnglePsi')
 	rotcol = starcol_exact_label(starlabels, '_rlnAngleRot')
 	tiltcol = starcol_exact_label(starlabels, '_rlnAngleTilt')
-	pixelsizecol = starcol_exact_label(starlabels, '_rlnDetectorPixelSize')
 
-	
-	writestarheader(outstar, starlabels)
+
+	writestarheader(outstar, staroptics, starlabels)
 
 	npart = 0
+
 	for line in instar:
 		record = line.split()
 		if len(record)==len(starlabels): # if line looks valid
 				# Star file
-				angpix = float(record[pixelsizecol])
-				record[orixcol] = "{:.6f}".format(-data[npart,4]/angpix)
-				record[oriycol] = "{:.6f}".format(-data[npart,5]/angpix)
+				record[orixcol] = "{:.6f}".format(-data[npart,4])
+				record[oriycol] = "{:.6f}".format(-data[npart,5])
 				record[psipriorcol] = "{:.6f}".format(data[npart,1])
 				record[tiltpriorcol] = "{:.6f}".format(data[npart,2])
 				record[rotcol] = "{:.6f}".format(data[npart,3])
