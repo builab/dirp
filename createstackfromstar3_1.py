@@ -93,7 +93,7 @@ def learnstarheader(infile):
             doneoptics = True
         if line.startswith('loop_') & doneoptics == True:
             doneprelabels = True # read until 'loop_'
-            headeroptics += [line]
+        headeroptics += [line]
     while not doneheader:
         line=infile.readline()
         if not line.startswith('_'): # read all lines the start with '_'
