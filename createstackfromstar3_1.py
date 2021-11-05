@@ -81,10 +81,13 @@ def learnstarheader(infile):
     infile.seek(0) # Go to the beginning of the starfile
     doneheader = False
     doneprelabels = False
-    doneoptics = False
+    doneoptics = True
     headerlabels = []
     while not doneprelabels:
         line=infile.readline()
+        # Check if star 3.1 format
+        if line.startswith('data_optics'):
+            doneoptics = False
         if line.startswith('data_particles'):
             doneoptics = True
         if line.startswith('loop_') & doneoptics == True:
