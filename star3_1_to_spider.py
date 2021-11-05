@@ -17,10 +17,13 @@ def learnstarheader(infile):
 	infile.seek(0) # Go to the beginning of the starfile
 	doneheader = False
 	doneprelabels = False
+	doneoptics = False
 	headerlabels = []
 	while not doneprelabels:
 		line=infile.readline()
-		if line.startswith('loop_'):
+		if line.startswith('data_particles')
+			doneoptics = True
+		if line.startswith('loop_') & doneoptics = True:
 			doneprelabels = True # read until 'loop_'
 	while not doneheader:
 		line=infile.readline()
