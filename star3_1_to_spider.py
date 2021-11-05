@@ -71,6 +71,7 @@ if __name__=='__main__':
 
 	args = parser.parse_args()
 	
+	print("Compatible with Relion 3.1 and 3.0")
 	
 	instar = open(args.istar, 'r')
 	outspider = open(args.o, 'w')
