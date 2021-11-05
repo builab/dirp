@@ -136,8 +136,8 @@ if __name__=='__main__':
 	
 	if len(starlabels) < 22:
 		starlabels = appendstarlabel(starlabels, '_rlnGroupNumber #22')
-		starlabels = appendstarlabel(starlables, '_rlnOriginXAngst #23')
-		starlabels = appendstarlabel(starlables, '_rlnOriginYAngst #24')
+		starlabels = appendstarlabel(starlabels, '_rlnOriginXAngst #23')
+		starlabels = appendstarlabel(starlabels, '_rlnOriginYAngst #24')
 		starlabels = appendstarlabel(starlabels, '_rlnAngleRot #25')
 		starlabels = appendstarlabel(starlabels, '_rlnAngleTilt #26')
 		starlabels = appendstarlabel(starlabels, '_rlnAnglePsi #27')
