@@ -134,7 +134,7 @@ if __name__=='__main__':
 	#print(staroptics)
 
 	
-	if len(starlabels) < 21:
+	if len(starlabels) < 22:
 		starlabels = appendstarlabel(starlabels, '_rlnGroupNumber #22')
 		starlabels = appendstarlabel(starlables, '_rlnOriginXAngst #23')
 		starlabels = appendstarlabel(starlables, '_rlnOriginYAngst #24')
@@ -142,6 +142,7 @@ if __name__=='__main__':
 		starlabels = appendstarlabel(starlabels, '_rlnAngleTilt #26')
 		starlabels = appendstarlabel(starlabels, '_rlnAnglePsi #27')
 	
+	print(starlabels)
 	
 	coorxcol = starcol_exact_label(starlabels, '_rlnCoordinateX')
 	coorycol = starcol_exact_label(starlabels, '_rlnCoordinateY')
@@ -162,8 +163,6 @@ if __name__=='__main__':
 	classcol = starcol_exact_label(starlabels, '_rlnClassNumber')
 	microcol = starcol_exact_label(starlabels, '_rlnMicrographName')
 
-
-	
 	writestarheader(outstar, staroptics, starlabels)
 
 	# Write star file header
@@ -244,20 +243,18 @@ if __name__=='__main__':
 
 			
 			# Check this for 3_1
-			if len(record) < 25:
+			if len(record) < 22:
 				record += ["{:5d}".format(groupnumber)]
 				record += ["{:.6f}".format(-shx)]
 				record += ["{:.6f}".format(-shy)]
 				record += ["{:.6f}".format(phi)]
 				record += ["{:.6f}".format(psi)]
 				record += ["{:.6f}".format(theta)]
-				record += ["{:5d}".format(1)]			
 			else:
 				record[groupcol] = "{:5d}".format(groupnumber)
 				record[rotcol] = "{:.6f}".format(phi)
 				record[psicol] = "{:.6f}".format(psi)
 				record[tiltcol] = "{:.6f}".format(theta)
-				record[classcol] = "{:5d}".format(1)
 				record[orixcol] = "{:.6f}".format(-shx)
 				record[oriycol] = "{:.6f}".format(-shy)
 			
