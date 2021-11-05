@@ -23,7 +23,7 @@ def learnstarheader(infile):
 		line=infile.readline()
 		if line.startswith('data_particles'):
 			doneoptics = True
-		if line.startswith('loop_') & doneoptics = True:
+		if line.startswith('loop_') & doneoptics == True:
 			doneprelabels = True # read until 'loop_'
 	while not doneheader:
 		line=infile.readline()
