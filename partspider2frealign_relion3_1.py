@@ -142,7 +142,7 @@ if __name__=='__main__':
 		starlabels = appendstarlabel(starlabels, '_rlnAngleTilt #26')
 		starlabels = appendstarlabel(starlabels, '_rlnAnglePsi #27')
 	
-	print(starlabels)
+	#print(starlabels)
 	
 	coorxcol = starcol_exact_label(starlabels, '_rlnCoordinateX')
 	coorycol = starcol_exact_label(starlabels, '_rlnCoordinateY')
