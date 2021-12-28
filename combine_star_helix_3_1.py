@@ -53,7 +53,7 @@ if __name__=='__main__':
 	
 	df_particles1 = stardict1['particles']
 	
-	df_renumber1 = renumber_helicalID(df_particiles1)
+	df_renumber1 = renumber_helicalID(df_particles1)
 	
 	stardict1['particles'] = df_renumber1
 	
