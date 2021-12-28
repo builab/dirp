@@ -54,7 +54,9 @@ if __name__=='__main__':
 	stardict1 = starfile.read(args.i1)
 	df_optics1 = stardict1['optics']	
 	df_particles1 = stardict1['particles']
-	df_renumber1 = renumber_helicalID(df_particles1, 0)
+	# Temporary fix
+	df_renumber1 = renumber_helicalID(df_particles1.drop(['rlnClassNumber', 'rlnAutopickFigureOfMerit', 'rlnAngleRotFlipRatio']), 0)
+	#df_renumber1 = renumber_helicalID(df_particles1, 0)
 	
 	stardict2 = starfile.read(args.i2)
 	df_optics2 = stardict2['optics']	
