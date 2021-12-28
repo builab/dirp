@@ -58,11 +58,16 @@ if __name__=='__main__':
 	mag = 10000
 	occ = 100
 	sigma = 0.5
+	
+	# Extra field
+	header_list = ["rlnOriginXAngst", "rlnOriginYAngst", "rlnAngleRot", "rlnAngleTilt", "rlnAnglePsi"]
+	df_extra = pd.DataFrame(columns = header_list)	
+	df_part_out = df_part.drop(columns=header_list).copy()
 
-	groupnumber = 0
-	helicalid = 0
-	prevhelicalid = 0
-	prevmicroname = ''
+	#if not 'rlnOriginXAngst' in df_part_out.columns:
+		
+		
+
 
 	for npart in range(len(df_part)):
 		partandstack=df_part.loc[npart, 'rlnImageName'].split('@')
@@ -103,34 +108,18 @@ if __name__=='__main__':
 		linefr[14] = 0
 		linefr[15] = 0
 			
-
 				
 		df_part.loc[npart, 'rlnAngleTiltPrior'] = theta
 		df_part.loc[npart, 'rlnAnglePsiPrior'] = psi
 
-			
 		
-		if len(record) < 22:
-			record += ["{:5d}".format(groupnumber)]
-			record += ["{:.6f}".format(-shx)]
-			record += ["{:.6f}".format(-shy)]
-			record += ["{:.6f}".format(phi)]
-			record += ["{:.6f}".format(psi)]
-			record += ["{:.6f}".format(theta)]
-		else:
-			record[groupcol] = "{:5d}".format(groupnumber)
-			record[rotcol] = "{:.6f}".format(phi)
-			record[psicol] = "{:.6f}".format(psi)
-			record[tiltcol] = "{:.6f}".format(theta)
-			record[orixcol] = "{:.6f}".format(-shx)
-			record[oriycol] = "{:.6f}".format(-shy)
-			
-			
+		df_extra.loc[npart, 'rlnOriginXAngst'] = -shx
+		df_extra.loc[npart, 'rlnOriginYAngst'] = -shy
+		df_extra.loc[npart, 'rlnAnglePhi'] = phi
+		df_extra.loc[npart, 'rlnAnglePsi'] = psi
+		df_extra.loc[npart, 'rlnAngleTheta'] = theta
+							
+		writefrealignline(outfreali,linefr)			
 
-		writefrealignline(outfreali,linefr)
-		writestarline(outstar, record)
-			
 
-				
 	outfreali.close()
-	outstar.close()
