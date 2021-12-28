@@ -3,6 +3,7 @@
 """
 Created on Sat Dec  26 22:56:14 2021
 combine_star_helix to avoid the same helicalID
+Need to write a new file
 
 """
 
@@ -22,7 +23,7 @@ def renumber_helicalID(df_part, offset):
 		# This is highly dependent on the micrograph name, need to fix it in the future
 		# Do a temporary fix for now. Asumming file name is xxxx_01234_1-3.mrc
 		#micronum = re.sub('.*_(\d\d\d\d\d).mrc', '\\1', micronum)
-		print(helicalid)
+		#print(helicalid)
 		#micronum = int(micronum)
 		#print(record[psipriorcol])
 		if microname != prevmicroname:
@@ -59,7 +60,5 @@ if __name__=='__main__':
 	df_new = df_renumber1.append(df_renumber2, ignore_index=True)
 	stardict1['particles'] = df_new
 	
-	
-	# Offset to load in case many different object. Not use now
 	starfile.write(stardict1, args.o)
 	
