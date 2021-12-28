@@ -39,7 +39,7 @@ def renumber_helicalID(df_part, offset):
 if __name__=='__main__':
 	parser = argparse.ArgumentParser(description='Combine helical star files. Assuming same optic groups')
 	parser.add_argument('--i1', help='Input star file 1',required=True)
-	#parser.add_argument('--i2', help='Input star file 2',required=True)
+	parser.add_argument('--i2', help='Input star file 2',required=True)
 	parser.add_argument('--o', help='Output star file',required=True)
 
 	
