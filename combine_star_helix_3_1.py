@@ -8,7 +8,7 @@ combine_star_helix to avoid the same helicalID
 
 
 import numpy as np
-import starfile
+import starfile, os
 import argparse
 
 def renumber_helicalID(df_part):
