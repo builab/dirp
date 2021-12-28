@@ -3,6 +3,7 @@
 # Script to read aligned spider files of filament to star file
 # Convert spider into array of float for efficient memory
 # This can be improved using Panda to write to star file
+# To be fixed in the future
 
 
 import os, sys, argparse, math
@@ -26,7 +27,7 @@ def learnstarheader(infile):
 			doneoptics = True
 		if line.startswith('loop_') & doneoptics == True:
 			doneprelabels = True # read until 'loop_'
-			headeroptics += [line]
+		headeroptics += [line]
 	while not doneheader:
 		line=infile.readline()
 		if not line.startswith('_'): # read all lines the start with '_'
