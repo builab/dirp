@@ -8,7 +8,7 @@ combine_star_helix to avoid the same helicalID
 
 
 import numpy as np
-import starfile, os
+import starfile
 import argparse
 
 def renumber_helicalID(df_part):
@@ -19,11 +19,10 @@ def renumber_helicalID(df_part):
 	df_renumber = df_part.copy()
 	for i in range(len(df_part)):
 		microname=df_part.loc[i, 'rlnMicrographName']
-		micronum = os.path.basename(microname)
 		# This is highly dependent on the micrograph name, need to fix it in the future
 		# Do a temporary fix for now. Asumming file name is xxxx_01234_1-3.mrc
 		#micronum = re.sub('.*_(\d\d\d\d\d).mrc', '\\1', micronum)
-		#print(micronum)
+		print(helicalid)
 		#micronum = int(micronum)
 		#print(record[psipriorcol])
 		if microname != prevmicroname:
@@ -46,7 +45,6 @@ if __name__=='__main__':
 	
 	args = parser.parse_args()
 		
-
 	stardict1 = starfile.read(args.i1)
 	
 	df_optics1 = stardict1['optics']	
