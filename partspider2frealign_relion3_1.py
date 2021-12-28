@@ -16,7 +16,7 @@ def learnstarheader(infile):
 	doneprelabels = False
 	headerlabels = []
 	headeroptics = []
-        doneoptics = True
+	doneoptics = True
 	while not doneprelabels:
 		line=infile.readline()
 		# Check if star 3.1 format
