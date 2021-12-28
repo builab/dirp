@@ -27,7 +27,7 @@ if __name__=='__main__':
 	parser = argparse.ArgumentParser(description='Convert spider alignment to frealign and star')
 	parser.add_argument('--ispider', help='Input spider file',required=True)
 	parser.add_argument('--istar', help='Input segment star file',required=True)
-	parser.add_argument('--angpix', help='Input particle pixel size',required=True)
+	#parser.add_argument('--angpix', help='Input particle pixel size',required=True)
 	parser.add_argument('--ofreali', help='Output frealign file',required=True)
 	parser.add_argument('--ostar', help='Corresponding output star file',required=True)
 	#parser.add_argument('--nomicro', help='Test mode for only this number of micrographs',required=False)
@@ -109,8 +109,8 @@ if __name__=='__main__':
 		linefr[15] = 0
 			
 				
-		df_part.loc[npart, 'rlnAngleTiltPrior'] = theta
-		df_part.loc[npart, 'rlnAnglePsiPrior'] = psi
+		df_part_out.loc[npart, 'rlnAngleTiltPrior'] = theta
+		df_part_out.loc[npart, 'rlnAnglePsiPrior'] = psi
 
 		
 		df_extra.loc[npart, 'rlnOriginXAngst'] = -shx
@@ -121,5 +121,7 @@ if __name__=='__main__':
 							
 		writefrealignline(outfreali,linefr)			
 
-
+	df_out = pd.concat([df_part_out, df_extra], axis=1)
+	stardict['particles'] = df_out
+	starfile.write(stardict, args.ostar)
 	outfreali.close()
