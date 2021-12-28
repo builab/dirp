@@ -119,57 +119,22 @@ if __name__=='__main__':
 
 	args = parser.parse_args()
 	
-
+	stardict = starfile.read(args.istar)
 	
-	instar = open(args.istar, 'r')
-	outfreali = open(args.ofreali, 'w')
-	outstar = open(args.ostar, 'w')		
-	
-	data = readspiderfile(args.ispider)
-	
-	if is_star3_1(instar) == False:
+	# Check optics group
+	if stardict['optics'] is not None:
 		print("WARNING: Script will fail since star file is not in 3.1 format")
 		exit(0)
 	
-	# Reading star file header
-	[staroptics, starlabels] = learnstarheader(instar)
+	df_part = stardict['particles']
+	pixelsize = float(stardict['optics'].loc[0, 'rlnImagePixelSize'])
 	
-	#print(staroptics)
-
+	# Should be done as panda finally
+	outfreali = open(args.ofreali, 'w')
+	#outstar = open(args.ostar, 'w')		
 	
-	if len(starlabels) < 22:
-		starlabels = appendstarlabel(starlabels, '_rlnGroupNumber #22')
-		starlabels = appendstarlabel(starlabels, '_rlnOriginXAngst #23')
-		starlabels = appendstarlabel(starlabels, '_rlnOriginYAngst #24')
-		starlabels = appendstarlabel(starlabels, '_rlnAngleRot #25')
-		starlabels = appendstarlabel(starlabels, '_rlnAngleTilt #26')
-		starlabels = appendstarlabel(starlabels, '_rlnAnglePsi #27')
+	data = readspiderfile(args.ispider)
 	
-	#print(starlabels)
-	
-	coorxcol = starcol_exact_label(starlabels, '_rlnCoordinateX')
-	coorycol = starcol_exact_label(starlabels, '_rlnCoordinateY')
-	orixcol = starcol_exact_label(starlabels, '_rlnOriginXAngst')
-	oriycol = starcol_exact_label(starlabels, '_rlnOriginYAngst')
-	tiltpriorcol = starcol_exact_label(starlabels, '_rlnAngleTiltPrior')
-	psipriorcol = starcol_exact_label(starlabels, '_rlnAnglePsiPrior')
-	psicol = starcol_exact_label(starlabels, '_rlnAnglePsi')
-	rotcol = starcol_exact_label(starlabels, '_rlnAngleRot')
-	tiltcol = starcol_exact_label(starlabels, '_rlnAngleTilt')
-	helicalidcol = starcol_exact_label(starlabels, '_rlnHelicalTubeID')
-	dfucol = starcol_exact_label(starlabels, '_rlnDefocusU')
-	dfvcol = starcol_exact_label(starlabels, '_rlnDefocusV')
-	dfacol = starcol_exact_label(starlabels, '_rlnDefocusAngle')
-	ctfmeritcol = starcol_exact_label(starlabels, '_rlnCtfFigureOfMerit')
-	imagecol = starcol_exact_label(starlabels, '_rlnImageName')
-	groupcol = starcol_exact_label(starlabels, '_rlnGroupNumber')
-	classcol = starcol_exact_label(starlabels, '_rlnClassNumber')
-	microcol = starcol_exact_label(starlabels, '_rlnMicrographName')
-
-	writestarheader(outstar, staroptics, starlabels)
-
-	# Write star file header
-	# first file
 	firstline = 1
 	
 	# Stupid
@@ -179,96 +144,78 @@ if __name__=='__main__':
 	occ = 100
 	sigma = 0.5
 
-	npart=0
 	groupnumber = 0
 	helicalid = 0
 	prevhelicalid = 0
 	prevmicroname = ''
-	pixelsize = float(args.angpix) #3.1
 
-	for line in instar:
-		record = line.split()
-		if len(record) > 10: # if line looks valid
-			partandstack=record[imagecol].split('@')
-			imagename=partandstack[1]
-			basename = os.path.basename(imagename)
-			# Take care of segavg or particles
-			basename = str.replace(basename, '.mrcs', '');
-			basename = str.replace(basename, '_avg$', ''); # Take care of segment file incase
+	for npart in range(len(df_part)):
+		partandstack=df_part.loc[npart, 'rlnImageName'].split('@')
+		imagename=partandstack[1]
+		basename = os.path.basename(imagename)
+		# Take care of segavg or particles
+		basename = str.replace(basename, '.mrcs', '');
 			
-			shx_s = data[npart, 14]
-			shy_s = data[npart, 15]
-			psi = 360 - data[npart, 13]
-			psirad = psi*math.pi/180
-			theta = data[npart, 3]
-			phi =  data[npart, 4]
+		shx_s = data[npart, 14]
+		shy_s = data[npart, 15]
+		psi = 360 - data[npart, 13]
+		psirad = psi*math.pi/180
+		theta = data[npart, 3]
+		phi =  data[npart, 4]
 			
-			# Angular conversion
-			shx = -(shx_s*math.cos(psirad) + shy_s*math.sin(psirad))
-			shy = -(-shx_s*math.sin(psirad) + shy_s*math.cos(psirad))
+		# Angular conversion
+		shx = -(shx_s*math.cos(psirad) + shy_s*math.sin(psirad))
+		shy = -(-shx_s*math.sin(psirad) + shy_s*math.cos(psirad))
 
-			shx = shx*pixelsize
-			shy = shy*pixelsize
-			
-			microname = record[microcol]
-			if microname != prevmicroname:
-				groupnumber +=1
-				prevmicroname = microname
-				helicalid += 1
-				prevhelicalid = record[helicalidcol]
+		shx = shx*pixelsize
+		shy = shy*pixelsize
 				
-			if prevhelicalid != record[helicalidcol]:
-				helicalid += 1
-				prevhelicalid = record[helicalidcol]
-				
-			# Convert frealign
-			linefr[0] = npart + 1
-			linefr[1] = psi
-			linefr[2] = theta
-			linefr[3] = phi
-			linefr[4] = shx
-			linefr[5] = shy
-			linefr[6] = mag
-			linefr[7] = helicalid
-			linefr[8] = float(record[dfucol])
-			linefr[9] = float(record[dfvcol])
-			linefr[10] = float(record[dfacol])
-			linefr[11] = occ
-			linefr[12] = 0
-			linefr[13] = sigma
-			linefr[14] = 0
-			linefr[15] = 0
+		# Convert frealign
+		linefr[0] = npart + 1
+		linefr[1] = psi
+		linefr[2] = theta
+		linefr[3] = phi
+		linefr[4] = shx
+		linefr[5] = shy
+		linefr[6] = mag
+		linefr[7] = helicalid
+		linefr[8] = float(df_part.loc[npart, 'rlnDefocusU'])
+		linefr[9] = float(df_part.loc[npart, 'rlnDefocusV'])
+		linefr[10] = float(df_part.loc[npart, 'rlnDefocusAngle'])
+		linefr[11] = occ
+		linefr[12] = 0
+		linefr[13] = sigma
+		linefr[14] = 0
+		linefr[15] = 0
 			
 
 				
-			record[tiltpriorcol] = "{:.6f}".format(theta)
-			record[psipriorcol] = "{:.6f}".format(psi)
+		df_part.loc[npart, 'rlnAngleTiltPrior'] = theta
+		df_part.loc[npart, 'rlnAnglePsiPrior'] = psi
 
 			
-			# Check this for 3_1
-			if len(record) < 22:
-				record += ["{:5d}".format(groupnumber)]
-				record += ["{:.6f}".format(-shx)]
-				record += ["{:.6f}".format(-shy)]
-				record += ["{:.6f}".format(phi)]
-				record += ["{:.6f}".format(psi)]
-				record += ["{:.6f}".format(theta)]
-			else:
-				record[groupcol] = "{:5d}".format(groupnumber)
-				record[rotcol] = "{:.6f}".format(phi)
-				record[psicol] = "{:.6f}".format(psi)
-				record[tiltcol] = "{:.6f}".format(theta)
-				record[orixcol] = "{:.6f}".format(-shx)
-				record[oriycol] = "{:.6f}".format(-shy)
+		
+		if len(record) < 22:
+			record += ["{:5d}".format(groupnumber)]
+			record += ["{:.6f}".format(-shx)]
+			record += ["{:.6f}".format(-shy)]
+			record += ["{:.6f}".format(phi)]
+			record += ["{:.6f}".format(psi)]
+			record += ["{:.6f}".format(theta)]
+		else:
+			record[groupcol] = "{:5d}".format(groupnumber)
+			record[rotcol] = "{:.6f}".format(phi)
+			record[psicol] = "{:.6f}".format(psi)
+			record[tiltcol] = "{:.6f}".format(theta)
+			record[orixcol] = "{:.6f}".format(-shx)
+			record[oriycol] = "{:.6f}".format(-shy)
 			
 			
 
-			writefrealignline(outfreali,linefr)
-			writestarline(outstar, record)
-			npart += 1
+		writefrealignline(outfreali,linefr)
+		writestarline(outstar, record)
 			
 
 				
-	instar.close()
 	outfreali.close()
 	outstar.close()
