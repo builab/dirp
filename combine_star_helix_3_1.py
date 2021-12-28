@@ -22,7 +22,7 @@ def renumber_helicalID(df_part, offset):
 		# This is highly dependent on the micrograph name, need to fix it in the future
 		# Do a temporary fix for now. Asumming file name is xxxx_01234_1-3.mrc
 		#micronum = re.sub('.*_(\d\d\d\d\d).mrc', '\\1', micronum)
-		print(helicalid)
+		#print(helicalid)
 		#micronum = int(micronum)
 		#print(record[psipriorcol])
 		if microname != prevmicroname:
