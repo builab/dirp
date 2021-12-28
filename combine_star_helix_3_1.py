@@ -11,8 +11,6 @@ import numpy as np
 import starfile
 import argparse
 
-from eulerangles import euler2matrix
-
 def renumber_helicalID(df_part):
 	count=1
 	helicalid = 0
