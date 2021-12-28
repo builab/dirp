@@ -10,7 +10,7 @@ Need to write a new file
 
 import numpy as np
 import starfile
-import argparse
+import argparse, os
 
 def renumber_helicalID(df_part, offset):
 	count=1
@@ -45,6 +45,11 @@ if __name__=='__main__':
 
 	
 	args = parser.parse_args()
+	
+	try:
+		os.remove(args.o)
+	except OSError as e:
+    		print ("File {:s} not exist. Good to go!".format(args.o))
 		
 	stardict1 = starfile.read(args.i1)
 	df_optics1 = stardict1['optics']	
