@@ -22,7 +22,7 @@ def renumber_helicalID(df_part, offset):
 		# This is highly dependent on the micrograph name, need to fix it in the future
 		# Do a temporary fix for now. Asumming file name is xxxx_01234_1-3.mrc
 		#micronum = re.sub('.*_(\d\d\d\d\d).mrc', '\\1', micronum)
-		#print(helicalid)
+		print(helicalid)
 		#micronum = int(micronum)
 		#print(record[psipriorcol])
 		if microname != prevmicroname:
@@ -56,8 +56,8 @@ if __name__=='__main__':
 	offset = df_renumber1.loc[len(df_part) - 1, 'rlnHelicalTubeID']
 	df_renumber2 = renumber_helicalID(df_particles2, offset)
 
-	df_new = df_renumber1.append(df_renumber2, ignore_index=True)
-	stardict1['particles'] = df_new
+	#df_new = df_renumber1.append(df_renumber2, ignore_index=True)
+	#stardict1['particles'] = df_new
 	
 	
 	# Offset to load in case many different object. Not use now
