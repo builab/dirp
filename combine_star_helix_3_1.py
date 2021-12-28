@@ -53,7 +53,7 @@ if __name__=='__main__':
 	stardict2 = starfile.read(args.i2)
 	df_optics2 = stardict2['optics']	
 	df_particles2 = stardict2['particles']
-	offset = df_renumber1.loc[len(df_part) - 1, 'rlnHelicalTubeID']
+	offset = df_renumber1.loc[len(df_renumber1) - 1, 'rlnHelicalTubeID']
 	df_renumber2 = renumber_helicalID(df_particles2, offset)
 
 	#df_new = df_renumber1.append(df_renumber2, ignore_index=True)
