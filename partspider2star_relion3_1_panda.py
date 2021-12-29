@@ -14,12 +14,6 @@ def readspiderfile(infile):
 	"""The whole spider file content into an np array of float"""
 	data = np.loadtxt(infile, dtype='float', comments=';')
 	return data
-
-def writefrealignline(outfile, records):
-	"""Write a record (line) to an already open starfile"""
-	FORMAT = "%7d%8.2f%8.2f%8.2f%10.2f%10.2f%8d%6d%9.1f%9.1f%8.2f%8.2f%10d%11.4f%8.2f%8.2f\n"
-	outfile.write(FORMAT%(records[0],records[1],records[2],records[3],records[4],records[5],records[6],records[7],records[8],records[9],records[10],records[11],records[12],records[13],records[14],records[15]))
-	
 	
 if __name__=='__main__':
 	# get name of input starfile, output starfile, output stack file
@@ -51,8 +45,6 @@ if __name__=='__main__':
 	data = readspiderfile(args.ispider)
 	#print(data)
 	
-	# Stupid
-	linefr = [None] * 16
 	mag = 10000
 	occ = 100
 	sigma = 0.5
@@ -101,27 +93,7 @@ if __name__=='__main__':
 		shy = -(-shx_s*math.sin(psirad) + shy_s*math.cos(psirad))
 
 		shx = shx*pixelsize
-		shy = shy*pixelsize
-				
-		# Convert frealign
-		linefr[0] = npart + 1
-		linefr[1] = psi
-		linefr[2] = theta
-		linefr[3] = phi
-		linefr[4] = shx
-		linefr[5] = shy
-		linefr[6] = mag
-		# Need to fix this later
-		linefr[7] = helicalid
-		linefr[8] = float(df_part_out.loc[npart, 'rlnDefocusU'])
-		linefr[9] = float(df_part_out.loc[npart, 'rlnDefocusV'])
-		linefr[10] = float(df_part_out.loc[npart, 'rlnDefocusAngle'])
-		linefr[11] = occ
-		linefr[12] = 0
-		linefr[13] = sigma
-		linefr[14] = 0
-		linefr[15] = 0	
-		writefrealignline(outfreali,linefr)			
+		shy = shy*pixelsize		
 	
 		df_part_out.loc[npart, 'rlnAngleTiltPrior'] = theta
 		df_part_out.loc[npart, 'rlnAnglePsiPrior'] = psi
@@ -134,7 +106,6 @@ if __name__=='__main__':
 		df_extra.loc[npart, 'rlnAngleTilt'] = theta
 							
 
-	outfreali.close()
 	
 	try:
 		os.remove(args.ostar)
