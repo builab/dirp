@@ -19,6 +19,8 @@ def learnstarheader(infile):
 	doneoptics = True
 	while not doneprelabels:
 		line=infile.readline()
+		if line.startswith('#'):
+			continue
 		# Check if star 3.1 format
 		if line.startswith('data_optics'):
 			doneoptics = False
@@ -29,6 +31,8 @@ def learnstarheader(infile):
 		headeroptics += [line]
 	while not doneheader:
 		line=infile.readline()
+		if line.startswith('#'):
+			continue
 		if not line.startswith('_'): # read all lines the start with '_'
 			doneheader = True
 		else:
