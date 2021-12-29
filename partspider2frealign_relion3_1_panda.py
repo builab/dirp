@@ -37,7 +37,7 @@ if __name__=='__main__':
 	stardict = starfile.read(args.istar)
 	
 	# Check optics group
-	if stardict['optics'] is not None:
+	if stardict['optics'] is None:
 		print("WARNING: Script will fail since star file is not in 3.1 format")
 		exit(0)
 	
