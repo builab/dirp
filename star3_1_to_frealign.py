@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sat Dec  26 22:56:14 2021
-using starfile for robust conversion
+using starfile for robust conversion. Very quick
 """
 
 import numpy as np
