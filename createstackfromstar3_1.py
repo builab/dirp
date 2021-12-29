@@ -172,7 +172,7 @@ if __name__=='__main__':
             if len(record)==len(starlabels): # if line looks valid
                 nparts+=1
                 partandstack=record[imagecol].split('@')
-                print "reading particle",partandstack[0],"from stack",partandstack[1]
+                print("reading particle {:s} from stack {:s}".format(partandstack[0],partandstack[1]))
                 # write the relevant particle image to the output stack
                 # lazy MRC
                 frame = readMRClazy(partandstack[1])
