@@ -209,13 +209,14 @@ if __name__=='__main__':
 				record += ["{:.6f}".format(-shx)]
 				record += ["{:.6f}".format(-shy)]
 				record += ["{:.6f}".format(phi)]
-				record += ["{:.6f}".format(psi)]
 				record += ["{:.6f}".format(theta)]
+				record += ["{:.6f}".format(psi)]
+
 			else:
 				record[groupcol] = "{:5d}".format(groupnumber)
 				record[rotcol] = "{:.6f}".format(phi)
-				record[psicol] = "{:.6f}".format(psi)
 				record[tiltcol] = "{:.6f}".format(theta)
+				record[psicol] = "{:.6f}".format(psi)
 				record[orixcol] = "{:.6f}".format(-shx)
 				record[oriycol] = "{:.6f}".format(-shy)
 			
