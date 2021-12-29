@@ -73,14 +73,14 @@ if __name__=='__main__':
 
 	for npart in range(len(df_part)):
 		# Calculate new helicalID
-		microname=df_part.loc[i, 'rlnMicrographName']
+		microname=df_part.loc[npart, 'rlnMicrographName']
 		if microname != prevmicroname:
 			prevmicroname = microname
 			helicalid += 1
-			prevhelicalid = df_part.loc[i, 'rlnHelicalTubeID']	
-		if prevhelicalid != df_part.loc[i, 'rlnHelicalTubeID']:
+			prevhelicalid = df_part.loc[npart, 'rlnHelicalTubeID']	
+		if prevhelicalid != df_part.loc[npart, 'rlnHelicalTubeID']:
 			helicalid += 1
-			prevhelicalid = df_part.loc[i, 'rlnHelicalTubeID']
+			prevhelicalid = df_part.loc[npart, 'rlnHelicalTubeID']
 			
 		#partandstack=df_part.loc[npart, 'rlnImageName'].split('@')
 		#imagename=partandstack[1]
