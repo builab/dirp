@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 # Script to read aligned spider files of filament to star file
 # Convert spider into array of float for efficient memory
-# This can be improved using Panda to write to star file
-# To be fixed in the future
+# This is extremely slow
 
 
 import os, sys, argparse, math
