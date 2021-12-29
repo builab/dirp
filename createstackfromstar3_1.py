@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Script originally from John Rubinstein
-# Temporary modify to work with Star3_1
+# Update to work with python3 and relion3_1 format
 
 import os, sys, argparse
 import numpy as n
