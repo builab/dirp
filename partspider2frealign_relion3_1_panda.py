@@ -43,18 +43,17 @@ if __name__=='__main__':
 	
 	df_part = stardict['particles']
 	pixelsize = float(stardict['optics'].loc[0, 'rlnImagePixelSize'])
+	print(df_part)
 	
 	# Should be done as panda finally
 	outfreali = open(args.ofreali, 'w')
 	#outstar = open(args.ostar, 'w')		
 	
 	data = readspiderfile(args.ispider)
-	
-	firstline = 1
+	print(data)
 	
 	# Stupid
-	tmp = '1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16'
-	linefr = tmp.split()
+	linefr = [None] * 16
 	mag = 10000
 	occ = 100
 	sigma = 0.5
