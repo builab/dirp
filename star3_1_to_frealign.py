@@ -7,7 +7,7 @@ using starfile for robust conversion
 
 import numpy as np
 import starfile
-import argparse, os
+import argparse
 
 if __name__=='__main__':
 	parser = argparse.ArgumentParser(description='Combine helical star files. Assuming same optic groups')
