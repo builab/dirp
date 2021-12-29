@@ -13,7 +13,6 @@ import starfile
 import argparse, os
 
 def renumber_helicalID(df_part, offset):
-	count=1
 	helicalid = 0 + offset
 	prevhelicalid = 0
 	prevmicroname = ''
