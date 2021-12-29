@@ -37,7 +37,7 @@ if __name__=='__main__':
 	
 	out[:, 0] = np.arange(1, npart + 1, 1)
 	out[:, 1] = df_part.loc[:, 'rlnAnglePsi'].to_numpy()	
-	out[:, 2] = df_part.loc[:, 'rlnAngleTheta'].to_numpy()	
+	out[:, 2] = df_part.loc[:, 'rlnAngleTilt'].to_numpy()	
 	out[:, 3] = df_part.loc[:, 'rlnAngleRot'].to_numpy()	
 	out[:, 4] = df_part.loc[:, 'rlnOriginXAngst'].to_numpy()*-1	
 	out[:, 5] = df_part.loc[:, 'rlnOriginYAngst'].to_numpy()*-1	
