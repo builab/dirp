@@ -217,8 +217,9 @@ if __name__=='__main__':
 			linefr[1] = psi
 			linefr[2] = theta
 			linefr[3] = phi
-			linefr[4] = shx
-			linefr[5] = shy
+			# Reset using relion reextract
+			linefr[4] = 0
+			linefr[5] = 0
 			linefr[6] = mag
 			linefr[7] = helicalid
 			linefr[8] = float(record[dfucol])
