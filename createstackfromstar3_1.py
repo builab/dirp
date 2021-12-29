@@ -162,8 +162,8 @@ if __name__=='__main__':
         staroptics, starlabels=learnstarheader(instar)
         imagecol = starcol_containing_label(starlabels, 'ImageName')
         if imagecol == -1: 
-		print('The starfile does not contain a column with ImageName')
-		exit()
+                print('The starfile does not contain a column with ImageName')
+                exit()
         # write output starfile header
         writestarheader(outstar, staroptics, starlabels)
         nparts=0 # for every line in starfile
