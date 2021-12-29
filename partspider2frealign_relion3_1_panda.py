@@ -43,14 +43,14 @@ if __name__=='__main__':
 	
 	df_part = stardict['particles']
 	pixelsize = float(stardict['optics'].loc[0, 'rlnImagePixelSize'])
-	print(df_part)
+	#print(df_part)
 	
 	# Should be done as panda finally
 	outfreali = open(args.ofreali, 'w')
 	#outstar = open(args.ostar, 'w')		
 	
 	data = readspiderfile(args.ispider)
-	print(data)
+	#print(data)
 	
 	# Stupid
 	linefr = [None] * 16
@@ -77,11 +77,13 @@ if __name__=='__main__':
 			print(helicalid)
 			prevmicroname = microname
 			helicalid += 1
-			prevhelicalid = df_part_out.loc[npart, 'rlnHelicalTubeID']	
+			prevhelicalid = df_part_out.loc[npart, 'rlnHelicalTubeID']
+			print(helicalid)
 		if prevhelicalid != df_part_out.loc[npart, 'rlnHelicalTubeID']:
 			helicalid += 1
 			prevhelicalid = df_part_out.loc[npart, 'rlnHelicalTubeID']
-			
+			print(helicalid)
+	
 		#partandstack=df_part.loc[npart, 'rlnImageName'].split('@')
 		#imagename=partandstack[1]
 		#basename = os.path.basename(imagename)
