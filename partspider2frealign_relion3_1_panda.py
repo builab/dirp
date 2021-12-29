@@ -71,16 +71,16 @@ if __name__=='__main__':
 	prevhelicalid = 0
 	prevmicroname = ''
 
-	for npart in range(len(df_part)):
+	for npart in range(len(df_part_out)):
 		# Calculate new helicalID
-		microname=df_part.loc[npart, 'rlnMicrographName']
+		microname=df_part_out.loc[npart, 'rlnMicrographName']
 		if microname != prevmicroname:
 			prevmicroname = microname
 			helicalid += 1
-			prevhelicalid = df_part.loc[npart, 'rlnHelicalTubeID']	
-		if prevhelicalid != df_part.loc[npart, 'rlnHelicalTubeID']:
+			prevhelicalid = df_part_out.loc[npart, 'rlnHelicalTubeID']	
+		if prevhelicalid != df_part_out.loc[npart, 'rlnHelicalTubeID']:
 			helicalid += 1
-			prevhelicalid = df_part.loc[npart, 'rlnHelicalTubeID']
+			prevhelicalid = df_part_out.loc[npart, 'rlnHelicalTubeID']
 			
 		#partandstack=df_part.loc[npart, 'rlnImageName'].split('@')
 		#imagename=partandstack[1]
@@ -112,9 +112,9 @@ if __name__=='__main__':
 		linefr[6] = mag
 		# Need to fix this later
 		linefr[7] = helicalid
-		linefr[8] = float(df_part.loc[npart, 'rlnDefocusU'])
-		linefr[9] = float(df_part.loc[npart, 'rlnDefocusV'])
-		linefr[10] = float(df_part.loc[npart, 'rlnDefocusAngle'])
+		linefr[8] = float(df_part_out.loc[npart, 'rlnDefocusU'])
+		linefr[9] = float(df_part_out.loc[npart, 'rlnDefocusV'])
+		linefr[10] = float(df_part_out.loc[npart, 'rlnDefocusAngle'])
 		linefr[11] = occ
 		linefr[12] = 0
 		linefr[13] = sigma
