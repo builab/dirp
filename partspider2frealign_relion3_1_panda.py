@@ -122,6 +122,6 @@ if __name__=='__main__':
 		writefrealignline(outfreali,linefr)			
 
 	df_out = pd.concat([df_part_out, df_extra], axis=1)
-	stardict['particles'] = df_out
+	stardict['particles'] = df_part_out
 	starfile.write(stardict, args.ostar)
 	outfreali.close()
