@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 # Script to read aligned spider files of filament to star file
 # Convert spider into array of float for efficient memory
-# This can be improved using Panda to write to star file
-# To be fixed in the future
+# This script is not very robust but very efficient
 
 
 import os, sys, argparse, math
@@ -135,13 +134,13 @@ if __name__=='__main__':
 	#print(staroptics)
 
 	
-	if len(starlabels) < 22:
-		starlabels = appendstarlabel(starlabels, '_rlnGroupNumber #22')
-		starlabels = appendstarlabel(starlabels, '_rlnOriginXAngst #23')
-		starlabels = appendstarlabel(starlabels, '_rlnOriginYAngst #24')
-		starlabels = appendstarlabel(starlabels, '_rlnAngleRot #25')
-		starlabels = appendstarlabel(starlabels, '_rlnAngleTilt #26')
-		starlabels = appendstarlabel(starlabels, '_rlnAnglePsi #27')
+	if len(starlabels) < 19:
+		starlabels = appendstarlabel(starlabels, '_rlnGroupNumber #19')
+		starlabels = appendstarlabel(starlabels, '_rlnOriginXAngst #20')
+		starlabels = appendstarlabel(starlabels, '_rlnOriginYAngst #21')
+		starlabels = appendstarlabel(starlabels, '_rlnAngleRot #22')
+		starlabels = appendstarlabel(starlabels, '_rlnAngleTilt #23')
+		starlabels = appendstarlabel(starlabels, '_rlnAnglePsi #24')
 	
 	#print(starlabels)
 	
@@ -171,8 +170,7 @@ if __name__=='__main__':
 	firstline = 1
 	
 	# Stupid
-	tmp = '1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16'
-	linefr = tmp.split()
+	linefr = [None] * 16
 	mag = 10000
 	occ = 100
 	sigma = 0.5
@@ -187,13 +185,6 @@ if __name__=='__main__':
 	for line in instar:
 		record = line.split()
 		if len(record) > 10: # if line looks valid
-			partandstack=record[imagecol].split('@')
-			imagename=partandstack[1]
-			basename = os.path.basename(imagename)
-			# Take care of segavg or particles
-			basename = str.replace(basename, '.mrcs', '');
-			basename = str.replace(basename, '_avg$', ''); # Take care of segment file incase
-			
 			shx_s = data[npart, 14]
 			shy_s = data[npart, 15]
 			psi = 360 - data[npart, 13]
@@ -244,7 +235,7 @@ if __name__=='__main__':
 
 			
 			# Check this for 3_1
-			if len(record) < 22:
+			if len(record) < 19:
 				record += ["{:5d}".format(groupnumber)]
 				record += ["{:.6f}".format(-shx)]
 				record += ["{:.6f}".format(-shy)]
@@ -259,8 +250,6 @@ if __name__=='__main__':
 				record[orixcol] = "{:.6f}".format(-shx)
 				record[oriycol] = "{:.6f}".format(-shy)
 			
-			
-
 			writefrealignline(outfreali,linefr)
 			writestarline(outstar, record)
 			npart += 1
