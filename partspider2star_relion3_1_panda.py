@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Script to read aligned spider files of filament to star file
 # Convert spider into array of float for efficient memory
-# This is extremely slow
+# This is extremely slow. Need to vectorize it.
 
 
 import os, sys, argparse, math
