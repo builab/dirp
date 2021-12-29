@@ -60,8 +60,8 @@ if __name__=='__main__':
 	# Extra field
 	header_list = ["rlnOriginXAngst", "rlnOriginYAngst", "rlnAngleRot", "rlnAngleTilt", "rlnAnglePsi"]
 	df_extra = pd.DataFrame(columns = header_list)	
-	#df_part_out = df_part.drop(columns=header_list).copy()
-	df_part_out = df_part.copy()
+	df_part_out = df_part.drop(columns=header_list, errors='ignore').copy()
+	#df_part_out = df_part.copy()
 	#if not 'rlnOriginXAngst' in df_part_out.columns:
 		
 		
