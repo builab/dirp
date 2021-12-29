@@ -129,9 +129,9 @@ if __name__=='__main__':
 		
 		df_extra.loc[npart, 'rlnOriginXAngst'] = -shx
 		df_extra.loc[npart, 'rlnOriginYAngst'] = -shy
-		df_extra.loc[npart, 'rlnAnglePhi'] = phi
+		df_extra.loc[npart, 'rlnAngleRot'] = phi
 		df_extra.loc[npart, 'rlnAnglePsi'] = psi
-		df_extra.loc[npart, 'rlnAngleTheta'] = theta
+		df_extra.loc[npart, 'rlnAngleTilt'] = theta
 							
 
 	outfreali.close()
