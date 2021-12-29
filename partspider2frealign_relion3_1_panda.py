@@ -75,6 +75,7 @@ if __name__=='__main__':
 		# Calculate new helicalID
 		microname=df_part_out.loc[npart, 'rlnMicrographName']
 		if microname != prevmicroname:
+			print(helicalid)
 			prevmicroname = microname
 			helicalid += 1
 			prevhelicalid = df_part_out.loc[npart, 'rlnHelicalTubeID']	
