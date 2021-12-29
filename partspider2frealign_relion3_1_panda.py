@@ -99,7 +99,7 @@ if __name__=='__main__':
 		linefr[4] = shx
 		linefr[5] = shy
 		linefr[6] = mag
-		linefr[7] = int(df_part.loc[npart, 'rlnHelicalTubeID']
+		linefr[7] = int(df_part.loc[npart, 'rlnHelicalTubeID'])
 		linefr[8] = float(df_part.loc[npart, 'rlnDefocusU'])
 		linefr[9] = float(df_part.loc[npart, 'rlnDefocusV'])
 		linefr[10] = float(df_part.loc[npart, 'rlnDefocusAngle'])
