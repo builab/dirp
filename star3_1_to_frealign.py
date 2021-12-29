@@ -11,18 +11,43 @@ import argparse, os
 
 if __name__=='__main__':
 	parser = argparse.ArgumentParser(description='Combine helical star files. Assuming same optic groups')
-	parser.add_argument('--i1', help='Input star file 1',required=True)
-	parser.add_argument('--i2', help='Input star file 2',required=True)
-	parser.add_argument('--o', help='Output star file',required=True)
+	parser.add_argument('--i', help='Input star file',required=True)
+	parser.add_argument('--o', help='Output frealign file',required=True)
 
 	
 	args = parser.parse_args()
+	
+	# Default value
+	mag = 10000
+	occ = 100
+	sigma = 0.5
 	
 	try:
 		os.remove(args.o)
 	except OSError as e:
     		print ("File {:s} not exist. Good to go!".format(args.o))
 		
-	stardict1 = starfile.read(args.i1)
-	df_optics1 = stardict1['optics']	
-	df_particles1 = stardict1['particles']
+	stardict = starfile.read(args.i)
+	df_optics = stardict['optics']	
+	df_part = stardict['particles']
+	
+	npart = len(df_part)
+	
+	out = np.zeros((npart, 16))
+	
+	out[:, 0] = 1 + range(npart)
+	out[:, 1] = df_part.loc[:, 'rlnAnglePsi'].to_numpy()	
+	out[:, 2] = df_part.loc[:, 'rlnAngleTheta'].to_numpy()	
+	out[:, 3] = df_part.loc[:, 'rlnAngleRot'].to_numpy()	
+	out[:, 4] = df_part.loc[:, 'rlnOriginXAngst'].to_numpy()*-1	
+	out[:, 5] = df_part.loc[:, 'rlnOriginYAngst'].to_numpy()*-1	
+	out[:, 6] = out[:, 6] + mag
+	out[:, 7] = df_part.loc[:, 'rlnHelicalTubeID'].to_numpy()	
+	out[:, 8] = df_part.loc[:, 'rlnDefocusU'].to_numpy()	
+	out[:, 9] = df_part.loc[:, 'rlnDefocusV'].to_numpy()	
+	out[:, 10] = df_part.loc[:, 'rlnDefocusAngle'].to_numpy()	
+	out[:, 11] = out[:, 11] + occ
+	out[:, 13] = out[:, 13] + sigma
+	
+	np.savetxt(args.o, out, fmt='%9.2f', delimiter=' ')
+
