@@ -133,7 +133,13 @@ if __name__=='__main__':
 		df_extra.loc[npart, 'rlnAngleTheta'] = theta
 							
 
+	outfreali.close()
+	
+	try:
+		os.remove(args.ostar)
+	except OSError as e:
+    		print ("File {:s} not exist. Good to go!".format(args.ostar))
 	df_out = pd.concat([df_part_out, df_extra], axis=1)
 	stardict['particles'] = df_part_out
 	starfile.write(stardict, args.ostar)
-	outfreali.close()
+		
