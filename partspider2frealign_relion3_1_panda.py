@@ -67,15 +67,26 @@ if __name__=='__main__':
 	#if not 'rlnOriginXAngst' in df_part_out.columns:
 		
 		
-
+	helicalid = 0
+	prevhelicalid = 0
+	prevmicroname = ''
 
 	for npart in range(len(df_part)):
-		print(npart)
-		partandstack=df_part.loc[npart, 'rlnImageName'].split('@')
-		imagename=partandstack[1]
-		basename = os.path.basename(imagename)
+		# Calculate new helicalID
+		microname=df_part.loc[i, 'rlnMicrographName']
+		if microname != prevmicroname:
+			prevmicroname = microname
+			helicalid += 1
+			prevhelicalid = df_part.loc[i, 'rlnHelicalTubeID']	
+		if prevhelicalid != df_part.loc[i, 'rlnHelicalTubeID']:
+			helicalid += 1
+			prevhelicalid = df_part.loc[i, 'rlnHelicalTubeID']
+			
+		#partandstack=df_part.loc[npart, 'rlnImageName'].split('@')
+		#imagename=partandstack[1]
+		#basename = os.path.basename(imagename)
 		# Take care of segavg or particles
-		basename = str.replace(basename, '.mrcs', '');
+		#basename = str.replace(basename, '.mrcs', '');
 			
 		shx_s = data[npart, 14]
 		shy_s = data[npart, 15]
@@ -100,7 +111,7 @@ if __name__=='__main__':
 		linefr[5] = shy
 		linefr[6] = mag
 		# Need to fix this later
-		linefr[7] = int(df_part.loc[npart, 'rlnHelicalTubeID'])
+		linefr[7] = helicalid
 		linefr[8] = float(df_part.loc[npart, 'rlnDefocusU'])
 		linefr[9] = float(df_part.loc[npart, 'rlnDefocusV'])
 		linefr[10] = float(df_part.loc[npart, 'rlnDefocusAngle'])
@@ -108,12 +119,12 @@ if __name__=='__main__':
 		linefr[12] = 0
 		linefr[13] = sigma
 		linefr[14] = 0
-		linefr[15] = 0
-			
-				
+		linefr[15] = 0	
+		writefrealignline(outfreali,linefr)			
+	
 		df_part_out.loc[npart, 'rlnAngleTiltPrior'] = theta
 		df_part_out.loc[npart, 'rlnAnglePsiPrior'] = psi
-
+		df_part_out.loc[npart, 'rlnHelicalTubeID'] = helicalid
 		
 		df_extra.loc[npart, 'rlnOriginXAngst'] = -shx
 		df_extra.loc[npart, 'rlnOriginYAngst'] = -shy
@@ -121,7 +132,6 @@ if __name__=='__main__':
 		df_extra.loc[npart, 'rlnAnglePsi'] = psi
 		df_extra.loc[npart, 'rlnAngleTheta'] = theta
 							
-		writefrealignline(outfreali,linefr)			
 
 	df_out = pd.concat([df_part_out, df_extra], axis=1)
 	stardict['particles'] = df_part_out
