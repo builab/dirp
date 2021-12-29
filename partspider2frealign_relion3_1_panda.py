@@ -70,6 +70,7 @@ if __name__=='__main__':
 
 
 	for npart in range(len(df_part)):
+		print(npart)
 		partandstack=df_part.loc[npart, 'rlnImageName'].split('@')
 		imagename=partandstack[1]
 		basename = os.path.basename(imagename)
