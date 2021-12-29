@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Script to read aligned spider files of filament to star file
+# Cannot deal with star file with # in it
 # Convert spider into array of float for efficient memory
 # This script is not very robust but very efficient
 
