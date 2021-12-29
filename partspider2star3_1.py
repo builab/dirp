@@ -4,6 +4,7 @@
 # Cannot deal with star file with # in it
 # Convert spider into array of float for efficient memory
 # This script is not very robust but very efficient
+# This work to convert spider to star file
 
 
 import os, sys, argparse, math
