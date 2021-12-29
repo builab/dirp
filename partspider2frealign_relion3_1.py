@@ -169,10 +169,6 @@ if __name__=='__main__':
 	microcol = starcol_exact_label(starlabels, '_rlnMicrographName')
 
 	writestarheader(outstar, staroptics, starlabels)
-
-	# Write star file header
-	# first file
-	firstline = 1
 	
 	# Stupid
 	linefr = [None] * 16
@@ -190,7 +186,7 @@ if __name__=='__main__':
 	for line in instar:
 		record = line.split()
 		if len(record) > 10: # if line looks valid
-			print(record)
+			#print(record)
 			shx_s = data[npart, 14]
 			shy_s = data[npart, 15]
 			psi = 360 - data[npart, 13]
