@@ -286,7 +286,7 @@ def mainloop(params):
 	else:
 		print ("no philist.txt file specified, I will use median PHI")
 	
-    outfile = re.sub('(_[0-9]_r1.par)', '_unify\\1', params["fpar"])
+	outfile = re.sub('(_[0-9]_r1.par)', '_unify\\1', params["fpar"])
 	fout = open(outfile,"w")
 	MTnew = 0
 	for MT in MTlist:
