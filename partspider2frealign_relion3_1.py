@@ -222,7 +222,7 @@ if __name__=='__main__':
 			linefr[2] = theta
 			linefr[3] = phi
 			# Reset using relion reextract
-			if doResetShift == 1
+			if doResetShift == 1:
 				linefr[4] = 0
 				linefr[5] = 0
 			else:
