@@ -4,6 +4,7 @@
 # Cannot deal with star file with # in it
 # Convert spider into array of float for efficient memory
 # This script is not very robust but very efficient
+# Now, giving option to reset shift to 0 in the frealign file
 
 
 import os, sys, argparse, math
@@ -117,6 +118,8 @@ if __name__=='__main__':
 	parser.add_argument('--angpix', help='Input particle pixel size',required=True)
 	parser.add_argument('--ofreali', help='Output frealign file',required=True)
 	parser.add_argument('--ostar', help='Corresponding output star file',required=True)
+	parser.add_argument('--resetshift', help='Reset shift to 0 in frealign file',required=False, default=1)
+
 	#parser.add_argument('--nomicro', help='Test mode for only this number of micrographs',required=False)
 
 	args = parser.parse_args()
@@ -125,7 +128,8 @@ if __name__=='__main__':
 	
 	instar = open(args.istar, 'r')
 	outfreali = open(args.ofreali, 'w')
-	outstar = open(args.ostar, 'w')		
+	outstar = open(args.ostar, 'w')	
+	doResetShift = int(args.resetshift)	
 	
 	data = readspiderfile(args.ispider)
 	
@@ -218,8 +222,12 @@ if __name__=='__main__':
 			linefr[2] = theta
 			linefr[3] = phi
 			# Reset using relion reextract
-			linefr[4] = 0
-			linefr[5] = 0
+			if doResetShift == 1
+				linefr[4] = 0
+				linefr[5] = 0
+			else:
+				linefr[4] = shx
+				linefr[5] = shy
 			linefr[6] = mag
 			linefr[7] = helicalid
 			linefr[8] = float(record[dfucol])
