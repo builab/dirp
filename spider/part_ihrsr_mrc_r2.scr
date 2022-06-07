@@ -1,0 +1,607 @@
+;;;Egelmans IHRSR method, allowsng for out-of-plane orsentations of the helix
+; Simple IHRSR for segment (no splitting)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;Explanation of this script;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;This script runs interative rounds of helical reconstruction.  The first round is generally called round 2.
+;Inputs:
+;	required:
+;	1) initial reference volume, named volume001, 
+;	2) particles in a single stack (should be white particles on black background - need to invert cryo data) [image_stack]
+;	3) doc file with particle information [partdoc]
+;		particle#,micrograph#, filament#, Xcenter, Ycenter, orientation, defocus1, defocus2,astigmatism angle
+;	optional:
+;	4) helical symmetry doc file called symdoc.spi - usually start with just one set of values.  These will be imposed in the first round, then modified in subsequent rounds.
+;		required if doing helical symmetry searches
+;	5) doc file with angular increment and out-of-plane limits for each iteration [angincrdoc]
+;		this file will also contain parameter to change at each round: CC values to include in reconstruction and low-pass filter frequencies
+;		input should be:
+;		round#, angular increment, maximum out-of-plane for references, max. out-of-plane for reconstruction, minumum CC for reconstruction, lp frequency pass, lp frequency stop
+;	6) symmetry doc file for imposing point-group-symmetry during back projection [angsym] (currently not implemented)
+;	7) mask file for masking the reference at each round
+;
+;
+;The steps in each iteration are as follows:
+;d1) generate projections of the reference model starting, up to a maximum out-of-plane orientation
+;	these values can be fixed throughout refinement, or can be read from a doc file [angincrdoc] at each cycle
+;	reference volume will be lp/hp filtered and optionally masked before generating projections
+;2) projection matching using AP SHC of the data against these projections (currently can't restrict range of search - will check against all references)
+;3) generate a doc file with polarity info about each filament segment
+;4) selection of particles to use based on 3 criteria
+;	a) out-of-plane orientation less than a specified threshold [oopcut]
+;	b) shift perpendicular to helical axis (x-shift) less than a specified threshold [maxperp]
+;	c) rotation deviates from the helical axis orientation determined during paritcle picking by less than a specified threshold [maxrot]
+;5) rejection of any particles passing the above criteria that come from filaments with low polarity scores (determined by [minfracup])
+;6) back projection of full volume and random 1/2 volumes using Rb 32F
+;7) use Ed Egelmans IHRSR programs to search for helical symmetry
+;8) impose symmetry in SPIDER by rotating/translating volume and averaging
+;9) calculate the resolution of the reconstruction from the two unsymmetrized 1/2 volumes
+;
+;Outputs for each round:
+;	params/
+;	fparamzds+***		output parameters from the search
+;	fgoodparamzds+***	parameters for particles that meet the criteria from step 3 above
+;	pjangles***			angles used for generating references
+;	bpjangles***		back projection angles for each particle (original angles rotated by 90 deg. to get helical axis along Z for E.E. programs)
+;	apsearch***			coarse search for anitparallel symmetry
+;	apsearch_fine***	fine search for antiparallel symmetry
+;	fsc***				fsc curve comparing the even and odd volumes
+;	fsc***sym			fsc curve comparing even and odd symmetrized volumes
+;	volumes/
+;	volume***			final symmetrized reconstruction
+;	ftzdsk***			unsymmetrized volume produced with BP 32f
+;The first section (immediately below) has all of the input variables you need to change for your reconstruction
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;set number of processors to use.  Set to 0 to use all available processors
+[nproc]=40			;number of processors to use
+
+;;;;;input data
+fr g
+[search_stack]part_stack.mrcs ;image spider stack to use for the alignments. ignore the mrcs
+
+
+fr g
+[partdoc]part_particles					;particle info doc
+										;generated with mkpartinfo.scr
+
+
+[apix] = 1.37*4				   ;pixel size, in angstroms
+	
+
+;;;;;projection generating parameters
+;;;;;you can either specify values for these parameters to be used in every cycle, or read in a doc 
+;;;;;file with these values so they can differ each cycle (i.e. do large angular increment early on and reduce it as the refinement proceeds).
+;;;;;set [readincrflag] to 1 to read values from a doc file, to 0 to use the values input here
+		
+[readincrflag]=0
+		
+;;;;;these are the values used in every cycle if [readincrflag]=0
+[angincr] = 1.5		 ;angular increment for projections (phi when helical axis along Z)
+[maxoop] = 15		;max out-of-plane orientation for generating refs (theta when filament axis along Z)
+[oopcut]= 12		  ;maximum out-of-plane orientation to include in the reconstruction
+
+;;;;;define the file from which projection generating parameters will be read if [readincrflag]=1
+;;;;;should be in the format key=cycle number, registers are in the order [angincr],[maxoop],[oopcut]
+fr g
+[angincrdoc]angincrements   
+		
+;;;;;search paramters - search is done useing ap shc
+[mirflag] = 0		;set to 1 to allow mirroring search (phi=0-180, theta ~90 & ~270.  Generally use this
+								;set to 0 for no mirroring (phi=0,360, all thetas ~90).  Use this if you want to jump to frealign
+													
+[srangex] = 10  ;search range in x - set slightly greater than 1/2 the helical repeat distance
+[srangey] = 16 	;search range in y - set to your expected error in centering the helical axis
+[srad] = 50  ;search radius for ap sh in pixels [srad] < [radius] - [srange] - 3
+
+;;;;;the parameters below are rarely changed, and can safely all be left at 1 (entering larger values will speed up the search)
+[sstep] = 1			 ;step size for translation search (generally set to 1)
+[sradmin] = 1		   ;minimum radius for rot search (generally set to 1)
+[ringstep] = 1		 ;pixels of every [ringstep] radii are used in search (generally just set to 1 to use all the data)
+[raystep] = 1		   ;similar to [ringstep], but must be 1,2,4,8 or 16 (generally just set to 1)
+[angrange] = 4.5		;range of angles to search around previous angle assignment - set to 0 to search against all references
+[angchthresh] = 0.5 	;a reporting parameter - doesn't affect search
+
+
+;;;;;rejection parameters
+
+[maxrot] =  12		  ;maximum allowed deviation from helical axis orientation (from [rotdoc]), in degrees
+
+[maxperp] = 18		;maximum allowed shift perpendicular to helical axis (X shifts) (to include all shifts, this should be set to [srange]+2)
+
+[minfracup]=0.5		  ;helical segements with less than this fraction of particles having same polarity will be omitted from recon.
+									;set to 0.0 to keep all
+			
+[maxdev]=10		  ;maximum allowed deviation in degrees from the average inplane rotation for a helical segment
+									;set to 10000 to keep all
+
+[normflag]=0			;normalize CC within each reference class?  1=yes 0=no
+[mincc]=0.0				;minimum CC to use for reconstruction  Raw CC value if [normflag] set to 0
+									;normalized CC value (0.0-1.0) if [normflag] set to 1
+
+
+;;;;;back projection parameters - done with bp 32f
+[rotsym]=1		;rotational symmetry of the filament - used to limit reference projections
+						;for most filaments, set to 1
+						;for filaments with C2 symmetry set to 2, with C4 symmetry set to 4, etc.
+
+
+;;;;;helical search parameters 
+;;;;;will create temporary summed raw volume and use this for the symmetry search, if requested
+[hrot]=0   ;fixed helical rotation symmetry (degrees), used if not searching
+[hshift]=82.5/[apix]   ;fixed helical shift symmetry (pixels), used if not searching
+
+[avglength]=100		;total length of unsymmetrized helix to use in the reconstruction, in pixels
+					;a soft-edged mask is applied to the unsymmetrized mask to get rid of ragged ends
+					;so they're not included in the averaging.  Set to total image size to use full length
+
+;filtering frequencies
+;frequency = pixel size/resolution
+;low pass only used in first round - should be set quite low (40-50A?)
+;Gold Standard res. estimate from previous round used for cutoff in current round
+
+[hpfreq]=[apix]/300		;high pass frequency cutoff
+[lpfreq]=[apix]/25		;set  low pass frequency 
+[falloff]=6			;fall off in pixels for the low-pass filter (used to calculate stop freq. for Butterworth filter in FQ NP)
+
+
+;;;;;optionally apply a mask to the reference volume
+[maskflag]=1	;set to 1 to apply a mask to the reference
+				;set to 0 to leave unmasked
+
+fr g
+[maskfile]mask128 	;name of the mask for references
+
+;;;;;number of iterations to do
+[firstcycle] = 7		;number of the first cycle - usually start with 2
+[ncycles] = 8		 ;number of last cycle
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;end input parameters - hopefully you don't need to change anything below
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;set to use multiple processors if available
+md	
+set mp
+[nproc]
+
+
+
+;;;;;check that some input files are present
+iq fi [partdocexist]
+[partdoc]
+
+if([partdocexist].eq.0)then
+	vm
+	echo particle document file does not exist: [partdoc].spi
+	en d
+endif
+
+;if an input angular increment doc is to be used, check that it exists and has enough entries
+if([readincrflag].eq.1])then
+	iq fi [incrdocexist]
+	[angincrdoc]
+
+	if([incrdocexist].eq.0)then 
+		vm
+		echo angular increment document file does not exist: [angincrdoc].spi
+		en d
+	endif
+		
+	ud n [nangicrs]
+	[angincrdoc]
+
+	if([ncycles].gt.[nangincrs])then
+		vm
+		echo angular increment file does not have info for all requested refinement cycles
+	endif
+
+endif
+		
+
+;;;;;make a directory structure to try to organize things a little better (hah!)
+vm
+mkdir params
+		
+vm
+mkdir volumes
+
+vm
+mkdir masks
+
+;;;;;get some information about the input image stack
+
+;get number of particles in the data set
+ud n [nparticles]
+[partdoc]
+
+
+;get the image size from the first image in the stack
+fi [imgsize]
+1@[search_stack]
+(2)
+
+
+
+do lb50 [currcycle] = [firstcycle], [ncycles]
+	;turn off results file after first round
+	if([currcycle].gt.([firstcycle]+1))then
+		md
+		results off
+	endif
+
+	[prevcycle]=[currcycle]-1			   ;number of the previous cycle
+
+	;;;;;get angular increment and out-of-plane cutoffs from doc file, if requested
+	if([readincrflag].eq.1)then
+		ud [currcycle],[angincr],[maxoop],[oopcut]
+		[angincrdoc]
+
+	endif
+
+	;;;;;generate an output file with input parameters used in this round
+	vm
+	rm input_params_{**[currcycle]}
+
+	vm
+	echo "IHRSR input parameters for round {**[currcycle]}" >> input_params_{**[currcycle]}	  
+	vm
+	echo search_stack [search_stack] >> input_params_{**[currcycle]}
+	vm
+	echo partdoc [partdoc] >> input_params_{**[currcycle]}
+	vm
+	echo apix	{%f4.2%[apix]} >> input_params_{**[currcycle]}
+	vm
+	echo readincrflag	{*[readincrflag]} >> input_params_{**[currcycle]}
+	vm
+	echo angincr	{%f4.1%[angincr]} >> input_params_{**[currcycle]}
+	vm
+	echo maxoop		{%f4.1%[maxoop]} >> input_params_{**[currcycle]}
+	vm
+	echo oopcut		{%f4.1%[oopcut]} >> input_params_{**[currcycle]}
+	vm
+	echo angincrdoc		[angincrdoc] >> input_params_{**[currcycle]}
+	vm
+	echo srangex	{%f5.1%[srangex]} >> input_params_{**[currcycle]}
+	vm
+	echo srangey	{%f5.1%[srangey]} >> input_params_{**[currcycle]}
+	vm
+	echo srad		{%f5.1%[srad]} >> input_params_{**[currcycle]}
+	vm
+	echo sstep		{%f5.1%[sstep]} >> input_params_{**[currcycle]}
+	vm
+	echo sradmin	{%f5.1%[sradmin]} >> input_params_{**[currcycle]}
+	vm
+	echo ringstep	{%f5.1%[ringstep]} >> input_params_{**[currcycle]}
+	vm
+	echo raystep	{%f5.1%[raystep]} >> input_params_{**[currcycle]}
+	vm
+	echo angrange	{%f5.1%[angrange]} >> input_params_{**[currcycle]}
+	vm
+	echo angchthresh	{%f5.1%[angchthresh]} >> input_params_{**[currcycle]}
+	vm
+	echo maxrot			{%f5.1%[maxrot]} >> input_params_{**[currcycle]}
+	vm
+	echo maxperp		{%f5.1%[maxperp]} >> input_params_{**[currcycle]}
+	vm
+	echo minfracup		{%f5.1%[minfracup]} >> input_params_{**[currcycle]}
+	vm
+	echo maxdev			{%f6.1%[maxdev]} >> input_params_{**[currcycle]}
+	vm
+	echo mincc			{%f6.1%[mincc]} >> input_params_{**[currcycle]}
+	vm
+	echo rotsym			{**[rotsym]} >> input_params_{**[currcycle]} 
+	vm
+	echo hpfreq			{%f5.3%[hpfreq]} >> input_params_{**[currcycle]} 
+	vm
+	echo lpfreq		{%f5.3%[lpfreq]} >> input_params_{**[currcycle]} 
+	vm
+	echo maskflag		{*[maskflag]} >> input_params_{**[currcycle]} 
+	vm
+	echo maskfile		[maskfile] >> input_params_{**[currcycle]} 
+	
+
+	;;;;;generate the projections
+	;calculate max phi given rotational symmetry
+	[maxphi]=(360/[rotsym])-0.1
+
+	[thetamin]=(90-[maxoop])
+	[thetamax]=(90+[maxoop])
+		
+	
+	vo ea [anglenum]
+	[angincr]
+	[thetamin],[thetamax]
+	(0,[maxphi])
+	params/pjangles{***[currcycle]}
+	
+	;make empty in-line stack for references
+	ms
+	_10@
+	[imgsize],[imgsize]
+	[anglenum]
+
+	;get resolution limit if after first cycle
+	[lpfreqs]=[lpfreq]+([falloff]/[imgsize])
+
+	cp
+	volumes/volume{***[prevcycle]}
+	_5
+	
+
+	;;mask reference volume if requested
+	if([maskflag].gt.0)then
+		mm c
+		[maskfile]
+		_5
+	endif
+
+	;filter the reference volume to the desired resolution
+	fq np
+	_5
+	_6
+	(3)
+	[lpfreq]
+
+	fq np
+	_6
+	_7
+	(4)
+	[hpfreq]
+	
+
+	;generate projections
+	pj 3q
+	_7
+	[imgsize]
+	(1-[anglenum])
+	params/pjangles{***[currcycle]}
+	_10@*****
+
+	;delete filtered reference volumes
+	de
+	_5
+
+	de
+	_6
+
+	de
+	_7
+
+;;;;;do the search
+
+	;;; 160120 Avoid piling up the doc file, delete the doc file before
+	DE
+	params/fparamzds+{***[currcycle]}
+
+	if([currcycle].eq.2)then
+		ap shc
+		_10@*****
+		(1-[anglenum])
+		([srangex],[srangey],[sstep])
+		([sradmin],[srad],[ringstep],[raystep])
+		params/pjangles{***[currcycle]}
+		******@[search_stack]
+		(1-[nparticles])
+		*
+		(0),[angchthresh]
+		N,N
+		params/fparamzds+{***[currcycle]}
+
+	else
+		ap shc
+		_10@*****
+		(1-[anglenum])
+		([srangex],[srangey],[sstep])
+		([sradmin],[srad],[ringstep],[raystep])
+		params/pjangles{***[currcycle]}
+		******@[search_stack]
+		(1)-[nparticles]
+		params/fparamzds+{***[prevcycle]}
+		[angrange],[angchthresh]
+		N,N
+		params/fparamzds+{***[currcycle]}
+	endif
+
+
+	;delete the inline stack of reference images and projection angles
+	de
+	_10@
+
+
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	;;;;;Get good particles, assign eulers, and do rotations and shifts
+	;;;;;eliminate particles with:
+	;;;;;1) out of plane orientations above threshold
+	;;;;;2) translations perpendicular to helical axis above threshold
+	;;;;;3) rotations greater than the threshold from helical axis orientation (determined from particle picking)
+
+	;calculate minimum allowed theta for rejection #1
+	[thetamin]=90-[oopcut]
+	[thetamax]=90+[oopcut]
+	
+	;loop over all particles
+	do lb11 [currpart]=1,[nparticles] 
+	
+		;;;;;get paricle parameters
+		ud ic,[currpart],[psi],[theta],[phi],[ref],[particle],[crot],[cxshift],[cyshift],[npj],[angch],[cc],[rot],[xshift],[yshift]
+		params/fparamzds+{***[currcycle]}
+		
+		ud ic [currpart],[a],[b],[c],[d],[angle]
+		[partdoc]
+	
+		[angle]=[angle]+90
+		if([angle].gt.360)[angle]=[angle]-360
+
+		;;;;;Rejection #0: CC cutoff
+		if([normflag].eq.1)then
+			ud ic [currpart],[ccn]
+			params/ccn{***[currcycle]}		
+			
+			if([ccn].lt.[mincc])goto lb11	
+			
+		else
+			
+			if([cc].lt.[mincc])goto lb11
+			
+		endif
+		
+		;;;;;Rejection #1: check for out-of-plane orientation > max allowed
+
+		if([theta].lt.[thetamin])goto lb11	;check for thetas <90
+		
+		if([theta].gt.90)then				;check for thetas >90
+			if([theta].lt.180)then
+				if([theta].gt.[thetamax]) goto lb11
+			endif
+		endif
+		
+		if([theta].gt.180)then				;check for thetas matching mirror projections
+			[thetatest]=[theta]-180
+			if([thetatest].lt.[thetamin])goto lb11
+		endif
+
+		;;;;;Rejection #2: check for Y shift (perp. to helical axis) greater than threshold
+	
+		if(abs([yshift]).gt.[maxperp])goto lb11
+
+		;;;;;Rejection #3: check rotations deviating from helical axis.
+
+		if([angle].gt.180)[angle]=[angle]-180
+		if([rot].gt.180)[rot]=[rot]-180
+
+		[diff]=abs([angle]-[rot])
+
+		if([diff].gt.90)[diff]=abs([diff]-180)
+
+			if([diff].gt.[maxrot])goto lb11
+
+		;;;;;record particle number if it has passed through all rejections
+		ud ic [particle],[micro],[seg],[xcoord],[ycoord],[rot],[df1],[df2],[astang]
+		[partdoc]
+		
+		sd [particle],[particle]
+		params/goodpartlist{***[currcycle]}
+
+	lb11
+
+
+	doc ren
+	params/goodpartlist{***[currcycle]}
+	params/goodpartlist{***[currcycle]}
+
+
+	VM
+	cp params/goodpartlist{***[currcycle]}.spi params/goodpartlist{***[currcycle]}_polar.spi
+
+	;;;;;fix the parameter file so rb 3f gets correct shifts
+	do lb43 [currpart]=1,[nparticles]
+
+		ud ic,[currpart],[psi],[theta],[phi],[ref],[particle],[crot],[cxshift],[cyshift],[npj],[angch],[cc],[rot],[xshift],[yshift]
+		params/fparamzds+{***[currcycle]}
+
+		sd [currpart],[psi],[theta],[phi],[ref],[particle],[rot],[xshift],[yshift],[npj],[angch],[cc],[crot],[cxshift],[cyshift]
+		params/fparamzds+{***[currcycle]}fix
+
+	lb43
+
+	;;;;;cleanly close a few files
+	ud ice
+	params/fparamzds+{***[currcycle]}
+		
+	ud ice
+	params/polarity{***[currcycle]}
+
+	ud ice
+	params/goodpartlist{***[currcycle]}
+
+	ud ice
+	params/ccn{***[currcycle]}
+
+
+
+	;;;;;do the back projection
+	rb 3f
+	******@[search_stack]
+	params/goodpartlist{***[currcycle]}
+	params/fparamzds+{***[currcycle]}fix
+	*
+	volumes/ftzdsk{***[currcycle]}
+	*
+
+
+	;apply 1D repeat along Z instead of helical symmetrization
+	;mask out the ragged ends of the unsymmetrized volume
+	ma z
+	volumes/ftzdsk{***[currcycle]}
+	_4
+	(([avglength]/2),0)
+	C
+	E
+	(0)
+			
+	([imgsize]/10)
+
+	;pad volume to 3x length to avoid wraparound effects when shifting along Z
+	pd
+	_4
+	_5
+	[imgsize],[imgsize],([imgsize]*3)
+	N
+	(0)
+	(1,1,[imgsize]+1)
+	
+	;make a copy to rotate/translate
+	cp
+	_5
+	_6
+	
+	;calculate the number of times to rotate/shift the volume
+	[nrepeats]=int([imgsize]/[hshift])+1
+	
+	;iterate over the shift/rot positions
+	do [sym]=1,[nrepeats]
+	
+		;calculate the rotation/translation for this position
+		[shift]=[sym]*[hshift]
+		
+		
+		;do the positive shift
+		sh
+		_5
+		_8
+		(0,0,-[shift])
+		
+		;add the rotated/shifted volume to the average
+		ad
+		_6
+		_8
+		_6
+		
+		
+		;do the negative shift
+		sh
+		_5
+		_8
+		(0,0,[shift])
+		
+		;add the rotated/shifted volume to the average
+		ad
+		_6
+		_8
+		_6
+	
+	enddo
+	
+	;window the volume back down to original size
+	wi
+	_6
+	volumes/volume{***[currcycle]}
+	[imgsize],[imgsize],[imgsize]
+	(1,1,[imgsize]+1)
+
+
+lb50
+
+;end of current cycle
+
+en
