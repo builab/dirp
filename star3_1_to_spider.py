@@ -4,6 +4,7 @@
 # 2020/06/19 Use IHRSR angle interpolation -atan2(x,y) instead of -atan2(y,x) like Relion. Also rot = 0-360 in IHRSR
 # 2020/06/20 Take care of segID unique in spider
 # 2020/06/21 Take care of specific name, required micrograph name xxx_01245.mrc
+# 2022/06/22 Take care of random micrograph name but still require continouty. Ok for now for more stable than before
 """
 Created on Sat Jun  6 17:35:42 2020
 @author: kbui2
@@ -89,12 +90,15 @@ if __name__=='__main__':
 	ctfmeritcol = starcol_exact_label(starlabels, '_rlnCtfFigureOfMerit')
 
 	# Stupid
+	# Stupid
 	tmp = '1 2 3 4 5 6 7 8 9 10 11 12'
 	line2 = tmp.split()
 	count=1
 	helicalid = 0
 	prevhelicalid = 0
 	prevmicroname = ''
+	microcount=1
+	microdict = {}
 	for line in instar:
 		record = line.split()
 		if len(record)==len(starlabels): # if line looks valid
@@ -103,14 +107,16 @@ if __name__=='__main__':
 			# This is highly dependent on the micrograph name, need to fix it in the future
 			# Do a temporary fix for now. Asumming file name is xxxx_01234_1-3.mrc
 			#micronum = re.sub('.*_(\d\d\d\d\d).mrc', '\\1', micronum)
-			micronum = re.sub('.*_(\d\d\d\d\d).*.mrc', '\\1', micronum)
-			print(micronum)
-			micronum = int(micronum)
+			#micronum = re.sub('^(\d\d\d\d\d).*.mrc', '\\1', micronum)
+			#print(micronum)
+			#micronum = int(micronum)
 			#print(record[psipriorcol])
 			if microname != prevmicroname:
+				microdict[microname] = microcount
 				prevmicroname = microname
 				helicalid += 1
 				prevhelicalid = record[helicalidcol]	
+				microcount +=1
 			if prevhelicalid != record[helicalidcol]:
 				helicalid += 1
 				prevhelicalid = record[helicalidcol]
@@ -119,7 +125,7 @@ if __name__=='__main__':
 			# Extract coordinate
 			line2[1] = str(10)
 			line2[0] = str(count)
-			line2[2] = str(micronum)
+			line2[2] = str(microdict[microname])
 			line2[3] = str(helicalid)
 			line2[4] = record[coorxcol]
 			line2[5] = record[coorycol]
@@ -130,7 +136,6 @@ if __name__=='__main__':
 			line2[10] = "{:.6f}".format(1)
 			line2[11] = record[ctfmeritcol]
 			writestarline(outspider,line2)
-			count += 1
-				
+			count += 1				
 	instar.close()
 	outspider.close()
